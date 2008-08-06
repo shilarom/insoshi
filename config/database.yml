@@ -1,0 +1,27 @@
+development:
+  adapter: mysql
+  database: qosocial_development
+  username: root
+  password: rails 
+  timeout: 5000
+  
+test:
+  adapter: mysql
+  database: qosocial_test
+  username: root
+  password: rails
+  timeout: 5000
+
+staging:
+  adapter: mysql
+  database: qosocial_staging
+  username: root
+  password: rails
+  timeout: 5000
+
+production:
+  adapter: mysql
+  database: qosocial_production
+  username: root
+  password: rails
+  timeout: 5000
