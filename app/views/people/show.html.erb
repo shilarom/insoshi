@@ -61,12 +61,12 @@
     <%= display @person.description %>
   </div>
 
-  <%= render :partial => 'recent_activity' %>
+  
   <%= render :partial => 'wall' %>
 <%- end -%>
 
 <%- column_div :type => :secondary do -%>
-  <%= render :partial => 'shared/minifeed' %>
+  <%= render :partial => 'recent_activity' %>
   <%- if logged_in? -%>
     <%= render :partial => 'shared/contacts_preview',
                :locals => { :person => @person } %>

@@ -9,7 +9,7 @@
     </p>    
   <%- end -%>
   
-  <ul class="list activity full">
+  <ul class="list activity small">
      <%= render :partial => 'shared/activity',
                 :collection => @person.recent_activity,
                 :locals => { :destroy => (current_person? @person) } %>

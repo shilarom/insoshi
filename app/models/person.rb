@@ -105,7 +105,7 @@ class Person < ActiveRecord::Base
   before_create :create_blog
   before_save :encrypt_password
   before_validation :prepare_email, :handle_nil_description
-  after_create :connect_to_admin
+#  after_create :connect_to_admin
 
   before_update :set_old_description
   after_update :log_activity_description_changed
@@ -160,14 +160,7 @@ class Person < ActiveRecord::Base
   # Return a person-specific activity feed.
   # TODO: put some algorithms in here to improve feed quality.
   def feed
-    len = activities.length
-    if len < FEED_SIZE
-      # Mix in some global activities for smaller feeds.
-      global = Activity.global_feed[0...(Activity::GLOBAL_FEED_SIZE-len)]
-      (activities + global).uniq.sort_by { |a| a.created_at }.reverse
-    else
       activities
-    end
   end
 
   def recent_activity
