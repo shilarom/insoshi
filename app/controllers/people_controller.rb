@@ -22,7 +22,6 @@ class PeopleController < ApplicationController
     end
     if logged_in?
       @some_contacts = @person.some_contacts
-      @common_contacts = current_person.common_contacts_with(@person)
     end
     respond_to do |format|
       format.html
