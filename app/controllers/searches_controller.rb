@@ -11,7 +11,7 @@ class SearchesController < ApplicationController
     model = strip_admin(params[:model])
     page  = params[:page] || 1
 
-    unless %(Person Message ForumPost).include?(model)
+    unless %(Person Message ForumPost Contacts).include?(model)
       flash[:error] = "Invalid search"
       redirect_to home_url and return
     end
@@ -26,6 +26,9 @@ class SearchesController < ApplicationController
         model = "AllPerson"
       elsif model == "Message"
         filters['recipient_id'] = current_person.id
+      elsif model == "Contacts"
+        model = "Person"
+        grep_contacts = 1
       end
       @search = Ultrasphinx::Search.new(:query => query, 
                                         :filters => filters,
@@ -33,6 +36,13 @@ class SearchesController < ApplicationController
                                         :class_names => model)
       @search.run
       @results = @search.results
+      if grep_contacts
+        res = @results
+        @results = []
+        res.each do |person|
+          @results.push(person) if current_person.contacts.include?(person)
+        end
+      end
       if model == "AllPerson"
         # Convert to people so that the routing works.
         @results.map!{ |person| Person.find(person)}

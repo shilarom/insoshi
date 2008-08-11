@@ -4,6 +4,7 @@ module SearchesHelper
   def search_model
     return "Person"    if params[:controller] =~ /home/ or params[:controller] =~ /connections/
     return "ForumPost" if params[:controller] =~ /forums/
+    return "Contacts"  if params[:controller] =~ /connections/
     params[:model] || params[:controller].classify
   end
   
@@ -12,6 +13,8 @@ module SearchesHelper
       "Forums" 
     elsif params[:controller] == "messages" or params[:model] == "Message"
       "Messages"
+    elsif params[:controller] == "connections" or params[:model] == "Contacts"
+      "Contacts"
     else
       "People"
     end
