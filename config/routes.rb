@@ -20,7 +20,7 @@ ActionController::Routing::Routes.draw do |map|
      person.resources :comments
   end
   map.namespace :admin do |admin|
-    admin.resources :people, :preferences
+    admin.resources :people, :preferences, :companies
     admin.resources :forums do |forums|
       forums.resources :topics do |topic|
         topic.resources :posts

@@ -1,0 +1,16 @@
+<div class="profile vcard">
+<h2>
+  <span class="fn n"><%=h @company.name %></span>
+</h2>
+
+<%= display @company.description %>
+
+
+<p>
+  <b>Web:</b>
+  <%= link_to @company.web, @company.web %>
+</p>
+<br />
+<%= link_to 'Edit', edit_admin_company_path(@company) %> |
+<%= link_to 'Back', admin_companies_path %>
+</div>
