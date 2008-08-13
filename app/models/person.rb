@@ -37,7 +37,7 @@ class Person < ActiveRecord::Base
                   :message_notifications, :wall_comment_notifications,
                   :blog_comment_notifications
   # Indexed fields for Sphinx
-  is_indexed :fields => [ 'name', 'description', 'deactivated',
+  is_indexed :fields => [ 'id','name', 'description', 'deactivated',
                           'email_verified'],
              :conditions => "deactivated = false AND (email_verified IS NULL OR email_verified = true)"
   MAX_EMAIL = MAX_PASSWORD = 40

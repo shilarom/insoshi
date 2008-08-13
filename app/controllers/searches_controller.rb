@@ -28,7 +28,7 @@ class SearchesController < ApplicationController
         filters['recipient_id'] = current_person.id
       elsif model == "Contacts"
         model = "Person"
-        grep_contacts = 1
+        filters['id'] = current_person.contact_ids
       end
       @search = Ultrasphinx::Search.new(:query => query, 
                                         :filters => filters,
@@ -36,13 +36,6 @@ class SearchesController < ApplicationController
                                         :class_names => model)
       @search.run
       @results = @search.results
-      if grep_contacts
-        res = @results
-        @results = []
-        res.each do |person|
-          @results.push(person) if current_person.contacts.include?(person)
-        end
-      end
       if model == "AllPerson"
         # Convert to people so that the routing works.
         @results.map!{ |person| Person.find(person)}
