@@ -13,7 +13,7 @@ ActionController::Routing::Routes.draw do |map|
                                       :common_contacts => :get }
   map.connect 'people/verify/:id', :controller => 'people',
                                     :action => 'verify_email'
-  map.resources :people do |person|
+  map.resources :people, :member => {:update_company => :put} do |person|
      person.resources :messages
      person.resources :photos
      person.resources :connections

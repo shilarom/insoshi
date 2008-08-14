@@ -125,6 +125,11 @@ class PeopleController < ApplicationController
     end
   end
   
+  def update_company
+#    debugger
+    redirect_to home_url
+  end
+  
   private
 
     def setup

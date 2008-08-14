@@ -1,74 +1,29 @@
 <div id="profile_edit">
 
-<h3>Personal details</h3>
+<h3>Company details</h3>
 
   <%= error_messages_for :person %>
 
-  <% form_for @person do |f| %>
-
+  <% form_for @person.company_person, :url => 'update_company' do |f| %>
+    
     <div class="form_row">
-      <label for="person_name">Name</label>
-      <%= f.text_field :name, :maxlength => Person::MAX_NAME %>
+      <label for="company_person_company_id">Empresa</label>
+      <%= select("company_person", "company_id", companies.collect {|c| [c.name, c.id]})  %>
+    </div>
+    
+    <div class="form_row">
+      <label for="company_person_puesto">Puesto</label>
+      <%= f.text_field :puesto, :maxlength => Person::MAX_NAME %>
     </div>
 
     <div class="form_row">
-      <label for="person_description">Description
+      <label for="company_person_telefono">Telefono
       </label>
-
-      <%- unless @preview.nil? -%>
-        <%= display @preview %>
-      <%- end -%>
-
-      <p><%= formatting_note %></p>
-      <%= f.text_area :description %>
+      <%= f.text_field :telefono %>
     </div>
-
-    <div class="form_row">
-      <label for="person_email">Email</label>
-      <%= f.text_field :email, :maxlength => Person::MAX_EMAIL %>
-    </div>
-
-    <%- if global_prefs.email_notifications? -%>
-
-      <br />
-
-      <h3>Email notification preferences</h3>
-
-      <p>
-        You will receive email notifications
-        for each event type whose box is checked.
-      </p>
-
-
-      <div class="form_row">
-        <p>
-        <label for="person_connection_notifications"
-               class="checkbox">Connections:</label>
-        <%= f.check_box :connection_notifications %>
-        </p>
-        <p>
-        <label for="person_message_notifications"
-               class="checkbox">Messages:</label>
-        <%= f.check_box :message_notifications %>
-        </p>
-        <p>
-        <label for="person_wall_comment_notifications"
-               class="checkbox">Wall comments:</label>
-        <%= f.check_box :wall_comment_notifications %>
-        </p>
-        <p>
-        <label for="person_blog_comment_notifications"
-               class="checkbox">Blog comments:</label>
-        <%= f.check_box :blog_comment_notifications %>
-        </p>
-      </div>
-    <%- end -%>
-
-    <br />
 
     <div class="form_row">
       <%= f.submit "Update", :class => "button" %>
-      <%= f.submit "Preview", :id => "preview", :class => "button" %>
       <input type="hidden" name="type" value="info_edit" />
     </div>
     

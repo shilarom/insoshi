@@ -65,6 +65,8 @@ class Person < ActiveRecord::Base
                           Connection::REQUESTED, false, true]
 
   has_one :blog
+  has_one :company_person
+  has_one :company, :through => :company_person, :source => :company
   has_many :email_verifications
   has_many :comments, :as => :commentable, :order => 'created_at DESC',
                       :limit => NUM_WALL_COMMENTS
