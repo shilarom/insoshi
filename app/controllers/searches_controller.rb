@@ -28,7 +28,8 @@ class SearchesController < ApplicationController
         filters['recipient_id'] = current_person.id
       elsif model == "Contacts"
         model = "Person"
-        filters['id'] = current_person.contact_ids
+        @person = params[:person_id].blank? ? current_person : Person.find(params[:person_id])
+        filters['id'] = @person.contact_ids
       end
       @search = Ultrasphinx::Search.new(:query => query, 
                                         :filters => filters,
