@@ -108,6 +108,7 @@ class Person < ActiveRecord::Base
   before_save :encrypt_password
   before_validation :prepare_email, :handle_nil_description
 #  after_create :connect_to_admin
+  after_create :create_company
 
   before_update :set_old_description
   after_update :log_activity_description_changed
@@ -408,6 +409,10 @@ class Person < ActiveRecord::Base
       unless tom.nil? or tom == self
         Connection.connect(self, tom)
       end
+    end
+    
+    def create_company
+      self.company_person = CompanyPerson.new()
     end
 
     ## Other private method(s)

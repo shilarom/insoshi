@@ -8,7 +8,9 @@
     
     <div class="form_row">
       <label for="company_person_company_id">Empresa</label>
-      <%= select("company_person", "company_id", companies.collect {|c| [c.name, c.id]})  %>
+      <%= select("company_person", "company_id", companies.collect {|c| [c.name, c.id]},
+        :selected => @person.company_person.company_id)
+        %>
     </div>
     
     <div class="form_row">

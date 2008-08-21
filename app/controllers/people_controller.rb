@@ -126,8 +126,15 @@ class PeopleController < ApplicationController
   end
   
   def update_company
-#    debugger
-    redirect_to home_url
+    @person = Person.find(params[:id])
+    respond_to do |format|
+      if @person.company_person.update_attributes(params[:company_person])
+        flash[:success] = 'Company changed.'
+        format.html { redirect_to(@person) }
+      else
+        format.html { render :action => "edit?edit=company" }
+      end
+    end
   end
   
   private
