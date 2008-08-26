@@ -20,5 +20,7 @@
 <%- end -%>
 
 <%- column_div :type => :secondary do -%>
-  <%= render :partial => 'shared/minifeed' %>
+  <%= render :partial => 'searches/box' %>
+  <%= render :partial => 'shared/contacts_messaging',
+               :locals => { :person => current_person } %>
 <%- end -%>

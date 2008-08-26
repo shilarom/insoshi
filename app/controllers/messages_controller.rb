@@ -8,6 +8,7 @@ class MessagesController < ApplicationController
   # GET /messages
   def index
     @messages = current_person.received_messages(params[:page])
+    @some_contacts = current_person.some_contacts
     respond_to do |format|
       format.html { render :template => "messages/index" }
     end
@@ -16,6 +17,7 @@ class MessagesController < ApplicationController
   # GET /messages/sent
   def sent
     @messages = current_person.sent_messages(params[:page])
+    @some_contacts = current_person.some_contacts
     respond_to do |format|
       format.html { render :template => "messages/index" }
     end
@@ -24,6 +26,7 @@ class MessagesController < ApplicationController
   # GET /messages/trash
   def trash
     @messages = current_person.trashed_messages(params[:page])
+    @some_contacts = current_person.some_contacts
     respond_to do |format|
       format.html { render :template => "messages/index" }
     end    
@@ -31,6 +34,7 @@ class MessagesController < ApplicationController
 
   def show
     @message.mark_as_read if current_person?(@message.recipient)
+    @some_contacts = current_person.some_contacts
     respond_to do |format|
       format.html
     end
