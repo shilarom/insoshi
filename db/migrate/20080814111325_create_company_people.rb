@@ -3,8 +3,6 @@ class CreateCompanyPeople < ActiveRecord::Migration
     create_table :company_people do |t|
       t.integer :person_id
       t.integer :company_id
-      t.string :puesto
-      t.integer :telefono
 
       t.timestamps
     end

@@ -125,15 +125,34 @@ class PeopleController < ApplicationController
     end
   end
   
-  def update_company
+  def add_company
     @person = Person.find(params[:id])
+    company_id = params[:company][:id].empty? ? 0 : params[:company][:id]
+    (Preference.find(:first).node_number-1).times do |num|
+      company_id = params["company#{num}"][:id] unless params["company#{num}"].nil?
+    end
     respond_to do |format|
-      if @person.company_person.update_attributes(params[:company_person])
-        flash[:success] = 'Company changed.'
-        format.html { redirect_to(@person) }
+      if company_id != 0 and !@person.company_ids.include?(company_id.to_i)
+        if @person.companies.length < Preference.find(:first).number_of_companies
+          @person.companies << Company.find(company_id) unless @person.company_ids.include?(company_id.to_i)
+          flash[:success] = 'Company added.'
+          format.html { redirect_to(edit_person_path(@person)+"?edit=company") }
+        else
+          flash[:error] = 'You can\'t add more companies.'
+          format.html { redirect_to(edit_person_path(@person)+"?edit=company") }
+        end
       else
-        format.html { render :action => "edit?edit=company" }
+        format.html { redirect_to(edit_person_path(@person)+"?edit=company") }
       end
+    end
+  end
+  
+  def delete_company
+    @person = Person.find(params[:id])
+    @person.companies.delete(Company.find(params[:company_id]))
+    respond_to do |format|
+      flash[:success] = 'Company deleted'
+      format.html { redirect_to(edit_person_path(@person)+"?edit=company") }
     end
   end
   

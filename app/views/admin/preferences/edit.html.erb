@@ -54,6 +54,22 @@
 
     <br />
 
+    <p>Number of nodes in a hierarchy</p>
+    <div class="form_row">
+      <label for="domain">Node number</label>
+      <%= select "preferences", :node_number, [1,2,3,4,5,6,7] %>
+    </div>
+
+    <br />
+
+    <p>Número de "compañias" puede tener cada persona máximo:</p>
+    <div class="form_row">
+      <label for="domain">Number of companies</label>
+      <%= select "preferences", :number_of_companies, [1,2,3,4,5,6,7] %>
+    </div>
+
+    <br />
+
     <div class="form_row">
       <label for="about">About</label>
       <br />

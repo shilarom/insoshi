@@ -3,20 +3,10 @@
 <% form_for(:company, :url => admin_company_path(@company), :html => {:method => :put}) do |f| %>
   <%= f.error_messages %>
 
+  <%= render :partial => 'company', :locals => {:f => f} %>
+  
   <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </p>
-  <p>
-    <%= f.label :description %><br />
-    <%= f.text_area :description, :cols => 80 %>
-  </p>
-  <p>
-    <%= f.label :web %><br />
-    <%= f.text_field :web %>
-  </p>
-  <p>
-    <%= f.submit "Update" %>
+    <%= f.submit "Update", :class => "button" %>
   </p>
 <% end %>
 

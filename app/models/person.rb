@@ -32,7 +32,7 @@ class Person < ActiveRecord::Base
 
   attr_accessor :password, :verify_password, :new_password,
                 :sorted_photos
-  attr_accessible :email, :password, :password_confirmation, :name,
+  attr_accessible :email, :password, :password_confirmation, :name, :phone,
                   :description, :connection_notifications,
                   :message_notifications, :wall_comment_notifications,
                   :blog_comment_notifications
@@ -65,8 +65,8 @@ class Person < ActiveRecord::Base
                           Connection::REQUESTED, false, true]
 
   has_one :blog
-  has_one :company_person
-  has_one :company, :through => :company_person, :source => :company
+  has_many :company_person
+  has_many :companies, :through => :company_person, :source => :company, :order => :name
   has_many :email_verifications
   has_many :comments, :as => :commentable, :order => 'created_at DESC',
                       :limit => NUM_WALL_COMMENTS

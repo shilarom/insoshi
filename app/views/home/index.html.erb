@@ -9,6 +9,8 @@
     <%= render :partial => 'messages_preview' %>
     <%= render :partial => 'shared/contacts_preview',
                :locals => { :person => current_person } %>
+    <%= render :partial => 'shared/app_box',
+               :locals => { :person => current_person } %>
   <%- else -%>
     <%- unless global_prefs.app_name.blank? -%>
       <h2>About <%= global_prefs.app_name %></h2>

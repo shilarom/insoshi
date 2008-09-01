@@ -1,33 +1,17 @@
 <div id="profile_edit">
 
-<h3>Company details</h3>
+  <h3>Company details</h3>
+  <ul class="">
+    <%- @person.companies.each do |company| -%>
+      <li><%= render :partial => "shared/company_tree",
+                     :locals => {:company => company} %></li>
+    <%- end -%>
+  </ul>
 
-  <%= error_messages_for :person %>
-
-  <% form_for @person.company_person, :url => 'update_company' do |f| %>
-    
-    <div class="form_row">
-      <label for="company_person_company_id">Empresa</label>
-      <%= select("company_person", "company_id", companies.collect {|c| [c.name, c.id]},
-        :selected => @person.company_person.company_id)
-        %>
+  <%- if @person.companies.length < Preference.find(:first).number_of_companies -%>
+    <%= link_to_function "Add new company","Effect.toggle('add_company', 'blind')"  %>
+    <div id="add_company" style="display: none;">
+      <div><%= render :partial => 'add_company' %></div>
     </div>
-    
-    <div class="form_row">
-      <label for="company_person_puesto">Puesto</label>
-      <%= f.text_field :puesto, :maxlength => Person::MAX_NAME %>
-    </div>
-
-    <div class="form_row">
-      <label for="company_person_telefono">Telefono
-      </label>
-      <%= f.text_field :telefono %>
-    </div>
-
-    <div class="form_row">
-      <%= f.submit "Update", :class => "button" %>
-      <input type="hidden" name="type" value="info_edit" />
-    </div>
-    
-<% end %>
+  <%- end -%>
 </div>

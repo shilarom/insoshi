@@ -1,5 +1,7 @@
 module CompaniesHelper
-  def companies
-    Company.find(:all, :order => "name ASC")
+  def companies(parent)
+    Company.find(:all, 
+      :conditions => [parent == 0 ? "parent_id = 0" : "parent_id > 0"], 
+      :order => "name ASC")
   end
 end

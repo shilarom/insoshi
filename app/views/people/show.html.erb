@@ -8,7 +8,7 @@
       <%- if current_person.description.blank? -%>
         <div class="error">
           Your description is blank.
-          <%= link_to "Click here to add a description",
+          <%= link_to "Click here to edit your profile",
                       edit_person_path(@person) %>
         </div>
       <%- else -%>
@@ -21,7 +21,15 @@
     <div class="toolbox">
       <%= image_tag @person.main_photo, :class => "profile-image photo",
                                         :alt => h(@person.name) %>
-
+      <%- unless @person.companies.empty? -%>
+        <ul class="tools">
+          <%- @person.companies.each do |company| -%>
+            <li><%= render :partial => "shared/company_tree",
+                           :locals => {:company => company} %></li>
+          <%- end -%>
+        </ul>
+      <%- end -%>
+  
       <%- unless current_person?(@person) -%>
         <ul class="tools">
          <%- if logged_in? -%>
@@ -82,6 +90,8 @@
 <%- column_div :type => :secondary do -%>
   <%- if logged_in? -%>
     <%= render :partial => 'shared/contacts_preview',
+               :locals => { :person => @person } %>
+    <%= render :partial => 'shared/app_box',
                :locals => { :person => @person } %>
   <%- end -%>
   <%= render :partial => 'recent_activity' %>

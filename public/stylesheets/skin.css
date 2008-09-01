@@ -234,12 +234,12 @@ p.welcome {
 .profile .note {
   margin-left: 252px;
 }
-.profile .toolbox ul {
+.profile .toolbox ul, ul.tools {
   background: url(/images/blue-grad.jpg) bottom repeat-x;
   border: 1px solid #ccc;
   width: 238px;
 }
-.profile ul.tools li {
+.profile ul.tools li, ul.tools li {
   background: none;
   font-size: 12px;
   list-style-type: disc;

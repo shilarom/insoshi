@@ -19,7 +19,7 @@ module ApplicationHelper
       photos   = menu_element("Photos",   photos_path)
       contacts = menu_element("Contacts",
                               person_connections_path(current_person))
-      links = [home, profile, contacts, messages, blog, people, forum]
+      links = [home, profile, contacts, messages, people]
     elsif logged_in? and admin_view?
       home =    menu_element("Home", home_path)
       people =  menu_element("People", admin_people_path)
@@ -27,7 +27,7 @@ module ApplicationHelper
                              admin_forums_path)
       companies = menu_element("Companies",admin_companies_path)
       preferences = menu_element("Prefs", admin_preferences_path)
-      links = [home, people, companies, forums, preferences]
+      links = [home, people, companies, preferences]
     else
       links = [home, people]
     end

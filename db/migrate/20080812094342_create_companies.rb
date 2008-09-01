@@ -1,6 +1,7 @@
 class CreateCompanies < ActiveRecord::Migration
   def self.up
     create_table :companies do |t|
+      t.integer :parent_id, :default => 0, :null => false
       t.string :name
       t.text :description
       t.string :web

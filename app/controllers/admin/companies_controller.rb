@@ -3,7 +3,7 @@ class Admin::CompaniesController < ApplicationController
   before_filter :login_required, :admin_required
 
   def index
-    @companies = Company.find(:all)
+    @companies = Company.find(:all, :conditions => ["parent_id = 0"])
 
     respond_to do |format|
       format.html
@@ -30,14 +30,28 @@ class Admin::CompaniesController < ApplicationController
   def edit
     @company = Company.find(params[:id])
   end
+  
+  def new_child
+    @parent = Company.find(params[:id])
+    @company = Company.new
+    @company.parent = @parent
+    respond_to do |format|
+      format.html # new.html.erb
+    end
+  end
 
   def create
     @company = Company.new(params[:company])
 
     respond_to do |format|
       if @company.save
-        flash[:notice] = 'Company was successfully created.'
-        format.html { redirect_to(admin_company_path(@company)) }
+        if @company.parent.nil?
+          flash[:notice] = 'Company was successfully created.'
+          format.html { redirect_to(admin_company_path(@company)) }
+        else
+          flash[:notice] = 'Node was successfully created.'
+          format.html { redirect_to(admin_company_path(@company.root)) }
+        end
       else
         format.html { render :action => "new" }
       end
@@ -62,7 +76,11 @@ class Admin::CompaniesController < ApplicationController
     @company.destroy
 
     respond_to do |format|
-      format.html { redirect_to(admin_companies_url) }
+      if @company.parent.nil?
+        format.html { redirect_to(admin_companies_url) }
+      else
+        format.html { redirect_to(admin_company_url(@company.root)) }
+      end
     end
   end
 end

@@ -12,8 +12,7 @@
     </div>
 
     <div class="form_row">
-      <label for="person_description">Description
-      </label>
+      <label for="person_description">Description</label>
 
       <%- unless @preview.nil? -%>
         <%= display @preview %>
@@ -26,6 +25,11 @@
     <div class="form_row">
       <label for="person_email">Email</label>
       <%= f.text_field :email, :maxlength => Person::MAX_EMAIL %>
+    </div>
+
+    <div class="form_row">
+      <label for="company_phone">Phone</label>
+      <%= f.text_field :phone %>
     </div>
 
     <%- if global_prefs.email_notifications? -%>
