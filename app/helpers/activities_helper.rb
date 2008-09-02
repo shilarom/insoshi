@@ -39,6 +39,8 @@ module ActivitiesHelper
       %(#{person_link(person)}'s profile picture has changed.)
     when "Person"
       %(#{person_link(person)}'s description has changed.)
+    when "CompanyPerson"
+      %(#{person_link(person)} has joined to '#{company_tree(activity.item.company)}')
     else
       # TODO: make this a more graceful falure (?).
       raise "Invalid activity type #{activity_type(activity).inspect}"
@@ -84,6 +86,8 @@ module ActivitiesHelper
       %(#{person_link(person)}'s profile picture has changed.)
     when "Person"
       %(#{person_link(person)}'s description has changed.)
+    when "CompanyPerson"
+      %(#{person_link(person)} has joined to '#{company_tree(activity.item.company)}')
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -112,6 +116,8 @@ module ActivitiesHelper
               "camera.gif"
             when "Person"
                 "edit.gif"
+            when "CompanyPerson"
+                "bargraph.gif"
             else
               # TODO: make this a more graceful falure (?).
               raise "Invalid activity type #{activity_type(activity).inspect}"

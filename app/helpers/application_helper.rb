@@ -128,6 +128,21 @@ module ApplicationHelper
       "HTML formatting supported"
     end
   end
+  
+  # Return a text with the company and it's ancestors
+  def company_tree(company)
+    text = ""
+    if company.ancestors.length > 0
+      company.ancestors.reverse.each do |c|
+        text += current_person.admin? ? (link_to c.name, admin_company_path(c)) : c.name
+        text += " &gt; "
+      end
+      text += company.name
+    else
+      text += company.name
+    end
+    text
+  end
 
   private
   
