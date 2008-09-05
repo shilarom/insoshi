@@ -108,7 +108,7 @@ class Person < ActiveRecord::Base
   before_save :encrypt_password
   before_validation :prepare_email, :handle_nil_description
 #  after_create :connect_to_admin
-  after_create :create_company
+#  after_create :create_company
 
   before_update :set_old_description
   after_update :log_activity_description_changed
