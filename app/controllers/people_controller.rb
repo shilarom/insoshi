@@ -22,6 +22,9 @@ class PeopleController < ApplicationController
     end
     if logged_in?
       @some_contacts = @person.some_contacts
+      @common_contacts = current_person.common_contacts_with(@person)
+      @groups = @person.groups
+      @own_groups = @person.own_groups
     end
     respond_to do |format|
       format.html
@@ -154,6 +157,21 @@ class PeopleController < ApplicationController
       flash[:success] = 'Company deleted'
       format.html { redirect_to(edit_person_path(@person)+"?edit=company") }
     end
+  end
+    
+  def groups
+    @person = Person.find(params[:id])
+    @groups = @person.groups
+    
+    respond_to do |format|
+      format.html
+    end
+  end
+  
+  def admin_groups
+    @person = Person.find(params[:id])
+    @groups = @person.own_groups
+    render :action => :groups
   end
   
   private

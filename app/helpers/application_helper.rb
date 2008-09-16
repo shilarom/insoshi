@@ -19,7 +19,8 @@ module ApplicationHelper
       photos   = menu_element("Photos",   photos_path)
       contacts = menu_element("Contacts",
                               person_connections_path(current_person))
-      links = [home, profile, contacts, messages, people]
+      groups = menu_element("Groups", groups_path())
+      links = [home, profile, contacts, messages, groups, people]
     elsif logged_in? and admin_view?
       home =    menu_element("Home", home_path)
       people =  menu_element("People", admin_people_path)
@@ -27,7 +28,8 @@ module ApplicationHelper
                              admin_forums_path)
       companies = menu_element("Companies",admin_companies_path)
       preferences = menu_element("Prefs", admin_preferences_path)
-      links = [home, people, companies, preferences]
+      groups = menu_element("Groups", admin_groups_path)
+      links = [home, people, groups, companies, preferences]
     else
       links = [home, people]
     end
@@ -62,8 +64,8 @@ module ApplicationHelper
   end
   
   # Set the input focus for a specific id
-  # Usage: <%= set_focus_to_id 'form_field_label' %>
-  def set_focus_to_id(id)
+  # Usage: <%= set_focus_to 'form_field_label' %>
+  def set_focus_to(id)
     javascript_tag("$('#{id}').focus()");
   end
   
@@ -156,16 +158,26 @@ module ApplicationHelper
     
     # Format text using BlueCloth (or RDiscount) if available.
     def format(text)
-      text.nil? ? "" : BlueCloth.new(text).to_html
-    rescue NameError
-      text
+      if text.nil?
+        ""
+      elsif defined?(RDiscount)
+        RDiscount.new(text).to_html
+      elsif defined?(BlueCloth)
+        BlueCloth.new(text).to_html
+      elsif no_paragraph_tag?(text)
+        content_tag :p, text
+      else
+        text
+      end
     end
     
     # Is a Markdown library present?
     def markdown?
-      BlueCloth.new("")
-      true
-    rescue NameError
-      false
+      defined?(RDiscount) or defined?(BlueCloth)
+    end
+    
+    # Return true if the text *doesn't* start with a paragraph tag.
+    def no_paragraph_tag?(text)
+      text !~ /^\<p/
     end
 end

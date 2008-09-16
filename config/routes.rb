@@ -1,4 +1,13 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :groups, 
+    :member => { :join => :post, 
+                 :leave => :post, 
+                 :members => :get, 
+                 :photos => :get,
+                 :new_photo => :post,
+                 :save_photo => :post,
+                 :delete_photo => :delete
+                 }
   map.resources :preferences
   map.resources :companies
   map.resources :searches
@@ -14,14 +23,17 @@ ActionController::Routing::Routes.draw do |map|
                                       :common_contacts => :get }
   map.connect 'people/verify/:id', :controller => 'people',
                                     :action => 'verify_email'
-  map.resources :people, :member => {:add_company => :put, :delete_company => :delete} do |person|
+  map.resources :people, 
+        :member => {:add_company => :put, 
+                    :delete_company => :delete,
+                    :groups => :get, :admin_groups => :get} do |person|
      person.resources :messages
      person.resources :photos
      person.resources :connections
      person.resources :comments
   end
   map.namespace :admin do |admin|
-    admin.resources :people, :preferences
+    admin.resources :people, :preferences, :groups
     admin.resources :companies, :member => {:new_child => :get}
     admin.resources :forums do |forums|
       forums.resources :topics do |topic|

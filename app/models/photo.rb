@@ -22,6 +22,7 @@ class Photo < ActiveRecord::Base
   UPLOAD_LIMIT = 5 # megabytes
   
   belongs_to :person
+  belongs_to :group
   has_attachment :content_type => :image, 
                  :storage => :file_system, 
                  :max_size => UPLOAD_LIMIT.megabytes,
@@ -56,8 +57,10 @@ class Photo < ActiveRecord::Base
   
   def log_activity
     if self.primary?
-      activity = Activity.create!(:item => self, :person => self.person)
-      add_activities(:activity => activity, :person => self.person)
+      unless self.person.nil?
+        activity = Activity.create!(:item => self, :person => self.person)
+        add_activities(:activity => activity, :person => self.person)
+      end
     end
   end
 

@@ -41,8 +41,9 @@ module ActivitiesHelper
       %(#{person_link(person)}'s description has changed.)
     when "CompanyPerson"
       %(#{person_link(person)} has joined to '#{company_tree(activity.item.company)}')
+    when "Group"
+      %(#{person_link(person)} created the new group '#{group_link(Group.find(activity.item))}')
     else
-      # TODO: make this a more graceful falure (?).
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
   end
@@ -77,7 +78,6 @@ module ActivitiesHelper
         have connected.)
     when "ForumPost"
       topic = activity.item.topic
-      # TODO: deep link this to the post
       %(#{person_link(person)} made a #{topic_link("forum post", topic)}.)
     when "Topic"
       %(#{person_link(person)} created a 
@@ -88,6 +88,8 @@ module ActivitiesHelper
       %(#{person_link(person)}'s description has changed.)
     when "CompanyPerson"
       %(#{person_link(person)} has joined to '#{company_tree(activity.item.company)}')
+    when "Group"
+      %(#{person_link(person)} created the new group '#{group_link(Group.find(activity.item))}')
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -118,8 +120,9 @@ module ActivitiesHelper
                 "edit.gif"
             when "CompanyPerson"
                 "bargraph.gif"
+            when "Group"
+              "add.gif"
             else
-              # TODO: make this a more graceful falure (?).
               raise "Invalid activity type #{activity_type(activity).inspect}"
             end
     image_tag("icons/#{img}", :class => "icon")

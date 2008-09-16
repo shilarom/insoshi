@@ -90,6 +90,9 @@ class Person < ActiveRecord::Base
                                             :limit => FEED_SIZE
   has_many :page_views, :order => 'created_at DESC'
   
+  has_many :own_groups, :class_name => "Group", :foreign_key => "person_id"
+  has_and_belongs_to_many :groups, :order => "name DESC"
+  
   validates_presence_of     :email, :name
   validates_presence_of     :password,              :if => :password_required?
   validates_presence_of     :password_confirmation, :if => :password_required?
@@ -128,7 +131,8 @@ class Person < ActiveRecord::Base
     def mostly_active(page = 1)
       paginate(:all, :page => page,
                      :per_page => RASTER_PER_PAGE,
-                     :conditions => conditions_for_mostly_active)
+                     :conditions => conditions_for_mostly_active,
+                     :order => "created_at DESC")
     end
     
     # Return *all* the active users.
@@ -161,7 +165,6 @@ class Person < ActiveRecord::Base
   ## Feeds
 
   # Return a person-specific activity feed.
-  # TODO: put some algorithms in here to improve feed quality.
   def feed
       activities
   end
