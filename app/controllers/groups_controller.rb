@@ -5,7 +5,8 @@ class GroupsController < ApplicationController
   
   def index
     @groups = Group.paginate(:page => params[:page],
-                                          :per_page => RASTER_PER_PAGE)
+                    :conditions => ["mode in (?)", "0,1"],
+                    :per_page => RASTER_PER_PAGE)
 
     respond_to do |format|
       format.html
@@ -34,6 +35,7 @@ class GroupsController < ApplicationController
 
   def create
     @group = Group.new(params[:group])
+    @group.person = current_person
 
     respond_to do |format|
       if @group.save

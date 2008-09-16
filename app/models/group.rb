@@ -14,6 +14,11 @@ class Group < ActiveRecord::Base
   
   is_indexed :fields => [ 'name', 'description']
   
+  # GROUP modes
+  PUBLIC = 0
+  PRIVATE = 1
+  HIDDEN = 2
+  
   ## Photo helpers
 
   def photo
