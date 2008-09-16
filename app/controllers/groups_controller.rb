@@ -4,9 +4,7 @@ class GroupsController < ApplicationController
     :new_photo, :save_photo, :delete_photo]
   
   def index
-    @groups = Group.paginate(:page => params[:page],
-                    :conditions => ["mode in (?)", "0,1"],
-                    :per_page => RASTER_PER_PAGE)
+    @groups = Group.not_hidden(params[:page])
 
     respond_to do |format|
       format.html
@@ -35,7 +33,7 @@ class GroupsController < ApplicationController
 
   def create
     @group = Group.new(params[:group])
-    @group.person = current_person
+    @group.owner = current_person
 
     respond_to do |format|
       if @group.save

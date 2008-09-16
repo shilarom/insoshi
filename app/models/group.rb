@@ -19,6 +19,18 @@ class Group < ActiveRecord::Base
   PRIVATE = 1
   HIDDEN = 2
   
+  class << self
+
+    # Return not hidden groups
+    def not_hidden(page = 1)
+      paginate(:all, :page => page,
+                     :per_page => RASTER_PER_PAGE,
+                     :conditions => ["mode = ? OR mode = ?", PUBLIC,PRIVATE],
+                     :order => "created_at DESC")
+    end
+  end
+  
+  
   ## Photo helpers
 
   def photo
