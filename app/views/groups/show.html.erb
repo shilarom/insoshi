@@ -65,12 +65,14 @@
 
 <%- column_div :type => :secondary do -%>
   <%= render :partial => 'searches/box' %>
-  <% if @group.pending_request.length > 0 %>
+  <% if @group.pending_request.length > 0 and @group.owner?(current_person) %>
     <%= render :partial => "people", 
                :locals => {:members => (@group.pending_request), :title => "pending request"} %>
   <% end %>
-  <%= render :partial => "people", 
-             :locals => {:members => @group.people, :title => "members"} %>
+  <% if @group.public? or @group.owner?(current_person) %>
+    <%= render :partial => "people", 
+               :locals => {:members => @group.people, :title => "members"} %>
+  <% end %>
   <%= render :partial => "people", 
              :locals => {:members => ([] << @group.owner), :title => "admin"} %>
 <%- end -%>

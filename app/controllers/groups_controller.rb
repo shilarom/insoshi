@@ -65,25 +65,25 @@ class GroupsController < ApplicationController
     end
   end
   
-  def join
-    @group = Group.find(params[:id])
-    current_person.groups << @group
-    respond_to do |format|
-      flash[:notice] = 'Joined to group.'
-      format.html { redirect_to(group_path(@group)) }
-    end
-  end
-  
-  def leave
-    @group = Group.find(params[:id])
-    if current_person.groups.include?(@group)
-      flash[:notice] = 'You have left the group.'
-      current_person.groups.delete(@group)
-    end
-    respond_to do |format|
-      format.html { redirect_to(group_path(@group)) }
-    end
-  end
+#  def join
+#    @group = Group.find(params[:id])
+#    current_person.groups << @group
+#    respond_to do |format|
+#      flash[:notice] = 'Joined to group.'
+#      format.html { redirect_to(group_path(@group)) }
+#    end
+#  end
+#  
+#  def leave
+#    @group = Group.find(params[:id])
+#    if current_person.groups.include?(@group)
+#      flash[:notice] = 'You have left the group.'
+#      current_person.groups.delete(@group)
+#    end
+#    respond_to do |format|
+#      format.html { redirect_to(group_path(@group)) }
+#    end
+#  end
   
   def members
     @group = Group.find(params[:id])

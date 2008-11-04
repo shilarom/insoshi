@@ -30,7 +30,7 @@ class Group < ActiveRecord::Base
       paginate(:all, :page => page,
                      :per_page => RASTER_PER_PAGE,
                      :conditions => ["mode = ? OR mode = ?", PUBLIC,PRIVATE],
-                     :order => "created_at DESC")
+                     :order => "name ASC")
     end
   end
   
@@ -90,8 +90,10 @@ class Group < ActiveRecord::Base
   private
   
   def log_activity
-    activity = Activity.create!(:item => self, :person => Person.find(self.person_id))
-    add_activities(:activity => activity, :person => Person.find(self.person_id))
+    if not self.hidden?
+      activity = Activity.create!(:item => self, :person => Person.find(self.person_id))
+      add_activities(:activity => activity, :person => Person.find(self.person_id))
+    end
   end
   
 end

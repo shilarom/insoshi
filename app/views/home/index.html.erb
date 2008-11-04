@@ -6,6 +6,7 @@
   <%= render :partial => "searches/box" %>
   <%- if logged_in? -%>
     <%= render :partial => 'requested_contacts' %>
+    <%= render :partial => 'requested_memberships' %>
     <%= render :partial => 'messages_preview' %>
     <%= render :partial => 'shared/contacts_preview',
                :locals => { :person => current_person } %>

@@ -40,7 +40,9 @@ module ActivitiesHelper
     when "Person"
       %(#{person_link(person)}'s description has changed.)
     when "Group"
-      %(#{person_link(person)} created the new group '#{group_link(Group.find(activity.item))}')
+      %(#{person_link(person)} created the group '#{group_link(Group.find(activity.item))}')
+    when "Membership"
+      %(#{person_link(person)} joined the group '#{group_link(Group.find(activity.item.group))}')
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -85,7 +87,9 @@ module ActivitiesHelper
     when "Person"
       %(#{person_link(person)}'s description has changed.)
     when "Group"
-      %(#{person_link(person)} created the new group '#{group_link(Group.find(activity.item))}')
+      %(#{person_link(person)} created the group '#{group_link(Group.find(activity.item))}')
+    when "Membership"
+      %(#{person_link(person)} joined the group '#{group_link(Group.find(activity.item.group))}')
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -115,6 +119,8 @@ module ActivitiesHelper
             when "Person"
                 "edit.gif"
             when "Group"
+              "new.gif"
+            when "Membership"
               "add.gif"
             else
               raise "Invalid activity type #{activity_type(activity).inspect}"

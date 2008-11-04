@@ -324,7 +324,14 @@ form, div, h2, ul, li {zoom: 1;}
 }
 
 
-div.accept_or_cancel_membership, div.cancel_membership {
+div.cancel_membership {
     float: right;
-    margin: -15px -13px;
+    margin: -20px -19px;
+}
+div.accept_or_cancel_membership {
+    float: right;
+    margin: -20px -31px;
+}
+.grid.medium div.accept_or_cancel_membership a, .grid.medium div.cancel_membership a {
+    display:inline;
 }

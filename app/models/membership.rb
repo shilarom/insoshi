@@ -64,6 +64,9 @@ class Membership < ActiveRecord::Base
         accepted_at = Time.now
         accept_one_side(person, group, accepted_at)
       end
+      unless [person, group].include?(Person.find_first_admin)
+        log_activity(mem(person, group))
+      end
     end
     
     def breakup(person, group)
@@ -101,10 +104,10 @@ class Membership < ActiveRecord::Base
                               :accepted_at => accepted_at)
     end
   
-    def log_activity(conn)
-      activity = Activity.create!(:item => conn, :person => conn.person)
-      add_activities(:activity => activity, :person => conn.person)
-      add_activities(:activity => activity, :person => conn.contact)
+    def log_activity(membership)
+#      debugger
+      activity = Activity.create!(:item => membership, :person => membership.person)
+      add_activities(:activity => activity, :person => membership.person)
     end
   end
   
