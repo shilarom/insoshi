@@ -13,10 +13,7 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
-
-    respond_to do |format|
-      format.html
-    end
+    group_redirect_if_not_public 
   end
 
   def new
@@ -92,10 +89,9 @@ class GroupsController < ApplicationController
     @group = Group.find(params[:id])
     @members = @group.people.paginate(:page => params[:page],
                                           :per_page => RASTER_PER_PAGE)
-    
-    respond_to do |format|
-      format.html
-    end
+    @pending = @group.pending_request.paginate(:page => params[:page],
+                                          :per_page => RASTER_PER_PAGE)
+    group_redirect_if_not_public
   end
   
   def photos
@@ -158,6 +154,18 @@ class GroupsController < ApplicationController
   
   def group_owner
     redirect_to home_url unless current_person == Group.find(params[:id]).owner
+  end
+  
+  def group_redirect_if_not_public
+    respond_to do |format|
+      if @group.public? or @group.private? or current_person.admin?
+          format.html 
+      elsif @group.owner?(current_person) or (@group.hidden? and @group.people.include?(current_person))
+        format.html 
+      else
+        format.html { redirect_to(groups_path) }
+      end
+    end
   end
   
 end

@@ -4,7 +4,11 @@ class Group < ActiveRecord::Base
   validates_presence_of :name, :person_id
   
   has_many :photos, :dependent => :destroy, :order => "created_at"
-  has_and_belongs_to_many :people, :order => "name DESC"
+  has_many :memberships
+  has_many :people, :through => :memberships, 
+    :conditions => "status = 0", :order => "name DESC"
+  has_many :pending_request, :through => :memberships, :source => "person",
+    :conditions => "status = 2", :order => "name DESC"
   
   belongs_to :owner, :class_name => "Person", :foreign_key => "person_id"
   
@@ -30,9 +34,23 @@ class Group < ActiveRecord::Base
     end
   end
   
+  def public?
+    self.mode == PUBLIC
+  end
+  
+  def private?
+    self.mode == PRIVATE
+  end
+  
+  def hidden?
+    self.mode == HIDDEN
+  end
+  
+  def owner?(person)
+    self.owner == person
+  end
   
   ## Photo helpers
-
   def photo
     # This should only have one entry, but be paranoid.
     photos.find_all_by_primary(true).first

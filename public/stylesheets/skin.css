@@ -322,3 +322,9 @@ form, div, h2, ul, li {zoom: 1;}
   margin: 0 105px;
   width: 324px;
 }
+
+
+div.delete  {
+    float: right;
+    margin: -15px -13px;
+}

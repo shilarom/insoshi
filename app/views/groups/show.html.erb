@@ -20,12 +20,26 @@
                                         :alt => h(@group.name) %>
       <ul class="tools">
         <%- unless group_owner?(current_person,@group) -%>
-          <%- unless current_person.groups.include?(@group) -%>
-            <li><%= link_to "Join to group",
-                        join_group_path(@group), :method => :post %></li>
-          <%- else -%>
-            <li><%= link_to "Leave group",
-                        leave_group_path(@group), :method => :post %></li>
+          <%- unless Membership.exist?(current_person,@group) -%>
+            <li>
+              <%= link_to "Join to group",
+                        group_memberships_path(@group), :method => :post %>
+            </li>
+          <%- end -%>
+          <%- if Membership.connected?(current_person,@group) -%>
+            <li>You are <strong><%= h @group.name%></strong>'s member
+                <br />
+                (<%= link_to "Leave group",
+                        membership_path(Membership.mem(current_person, @group)), 
+                        :method => :delete,
+                        :confirm => 
+                        "Are you sure you want to leave #{h @group.name}?" %>)
+            </li>
+          <%- end -%>
+          <%- if Membership.pending?(current_person, @group) -%>
+            <li>
+              You have requested to be member of <strong><%= h @group.name%></strong>
+            </li>
           <%- end -%>
         <%- else -%>
           <li>You are group's admin
