@@ -324,7 +324,7 @@ form, div, h2, ul, li {zoom: 1;}
 }
 
 
-div.delete  {
+div.accept_or_cancel_membership, div.cancel_membership {
     float: right;
     margin: -15px -13px;
 }

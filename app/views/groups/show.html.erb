@@ -65,6 +65,10 @@
 
 <%- column_div :type => :secondary do -%>
   <%= render :partial => 'searches/box' %>
+  <% if @group.pending_request.length > 0 %>
+    <%= render :partial => "people", 
+               :locals => {:members => (@group.pending_request), :title => "pending request"} %>
+  <% end %>
   <%= render :partial => "people", 
              :locals => {:members => @group.people, :title => "members"} %>
   <%= render :partial => "people", 

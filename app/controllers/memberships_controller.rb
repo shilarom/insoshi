@@ -5,7 +5,11 @@ class MembershipsController < ApplicationController
 
     respond_to do |format|
       if Membership.request(current_person, @group)
-        flash[:notice] = 'Membership request sent!'
+        if @group.public?
+          flash[:notice] = "You have joined to '#{@group.name}'"
+        else
+          flash[:notice] = 'Membership request sent!'
+        end
         format.html { redirect_to(home_url) }
       else
         # This should only happen when people do something funky
@@ -38,9 +42,8 @@ class MembershipsController < ApplicationController
   
   def suscribe
     @membership = Membership.find(params[:id])
-#    debugger
     @membership.accept
-#    
+
     respond_to do |format|
       flash[:success] = "You have accept '#{@membership.person.name}' for group '#{@membership.group.name}'"
       format.html { redirect_to(members_group_path(@membership.group)) }

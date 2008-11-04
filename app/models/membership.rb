@@ -13,8 +13,6 @@ class Membership < ActiveRecord::Base
   PENDING   = 2
   
   # Accept a membership request (instance method).
-  # Each connection is really two rows, so delegate this method
-  # to Connection.accept to wrap the whole thing in a transaction.
   def accept
     Membership.accept(person_id, group_id)
   end
@@ -32,7 +30,7 @@ class Membership < ActiveRecord::Base
     
     alias exist? exists?
     
-    # Make a pending connection request.
+    # Make a pending membership request.
     def request(person, group, send_mail = nil)
       if send_mail.nil?
         send_mail = global_prefs.email_notifications? &&
@@ -41,9 +39,14 @@ class Membership < ActiveRecord::Base
       if person.groups.include?(group) or Membership.exists?(person, group)
         nil
       else
-        transaction do
-          create(:person => person, :group => group, :status => PENDING)
-#          create(:person => contact, :contact => person, :status => REQUESTED)
+        if group.public? or group.private?
+          transaction do
+            create(:person => person, :group => group, :status => PENDING)
+          end
+          if group.public?
+            membership = person.memberships.find(:first, :conditions => ['group_id = ?',group])
+            membership.accept
+          end
         end
 #        if send_mail
 #          # The order here is important: the mail is sent *to* the contact,
