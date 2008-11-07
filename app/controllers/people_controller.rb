@@ -3,7 +3,7 @@ class PeopleController < ApplicationController
   skip_before_filter :require_activation, :only => :verify_email
   skip_before_filter :admin_warning, :only => [ :show, :update ]
   before_filter :login_required, :only => [ :show, :edit, :update ]
-  before_filter :correct_user_required, :only => [ :edit, :update ]
+  before_filter :correct_user_required, :only => [ :edit, :update, :invitations ]
   before_filter :setup
   
   def index
@@ -23,8 +23,8 @@ class PeopleController < ApplicationController
     if logged_in?
       @some_contacts = @person.some_contacts
       @common_contacts = current_person.common_contacts_with(@person)
-      @groups = @person.groups
-      @own_groups = @person.own_groups
+      @groups = current_person == @person ? @person.groups : @person.groups_not_hidden
+      @own_groups = current_person == @person ? @person.own_groups : @person.own_not_hidden_groups
     end
     respond_to do |format|
       format.html
@@ -130,7 +130,7 @@ class PeopleController < ApplicationController
   
   def groups
     @person = Person.find(params[:id])
-    @groups = @person.groups
+    @groups = current_person == @person ? @person.groups : @person.groups_not_hidden
     
     respond_to do |format|
       format.html
@@ -141,6 +141,16 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:id])
     @groups = @person.own_groups
     render :action => :groups
+  end
+  
+  def request_memberships
+    @person = Person.find(params[:id])
+    @requested_memberships = @person.requested_memberships
+  end
+  
+  def invitations
+    @person = Person.find(params[:id])
+    @invitations = @person.invitations
   end
   
   private

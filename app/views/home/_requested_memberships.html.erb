@@ -18,5 +18,9 @@
         </p>
       </li>
     <%- end -%>
+    <li class="more">
+      <%= link_to "See all &raquo;", 
+          request_memberships_person_path(current_person) %>
+    </li>
   </ul>
 <%- end -%>

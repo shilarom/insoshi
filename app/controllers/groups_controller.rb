@@ -61,29 +61,36 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       flash[:notice] = 'Group was successfully deleted.'
-      format.html { redirect_to(groups_path()) }
+      format.html { redirect_to(groups_path) }
     end
   end
   
-#  def join
-#    @group = Group.find(params[:id])
-#    current_person.groups << @group
-#    respond_to do |format|
-#      flash[:notice] = 'Joined to group.'
-#      format.html { redirect_to(group_path(@group)) }
-#    end
-#  end
-#  
-#  def leave
-#    @group = Group.find(params[:id])
-#    if current_person.groups.include?(@group)
-#      flash[:notice] = 'You have left the group.'
-#      current_person.groups.delete(@group)
-#    end
-#    respond_to do |format|
-#      format.html { redirect_to(group_path(@group)) }
-#    end
-#  end
+  def invite
+    @group = Group.find(params[:id])
+    @contacts = 
+      current_person.contacts - Membership.find_all_by_group_id(current_person.own_hidden_groups).collect{|x| x.person}
+    respond_to do |format|
+      if current_person.own_groups.include?(@group) and @group.hidden?
+        format.html
+      else
+        format.html { redirect_to(group_path(@group)) }
+      end
+    end
+  end
+  
+  def invite_them
+    @group = Group.find(params[:id])
+    invitations = params[:checkbox].collect{|x| x if  x[1]=="1" }.compact!
+    invitations.each do |invitation|
+      if Membership.find_all_by_group_id(@group, :conditions => ['person_id = ?',invitation[0].to_i]).empty?
+        Membership.invite(Person.find(invitation[0].to_i),@group)
+      end
+    end
+    respond_to do |format|
+      flash[:notice] = "You have invite some of your contacts to '#{@group.name}'"
+      format.html { redirect_to(group_path(@group)) }
+    end
+  end
   
   def members
     @group = Group.find(params[:id])
@@ -160,8 +167,10 @@ class GroupsController < ApplicationController
     respond_to do |format|
       if @group.public? or @group.private? or current_person.admin?
           format.html 
-      elsif @group.owner?(current_person) or (@group.hidden? and @group.people.include?(current_person))
-        format.html 
+      elsif @group.owner?(current_person) or 
+          (@group.hidden? and @group.people.include?(current_person)) or 
+          @group.has_invited?(current_person)
+        format.html
       else
         format.html { redirect_to(groups_path) }
       end

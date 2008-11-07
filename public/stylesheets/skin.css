@@ -335,3 +335,16 @@ div.accept_or_cancel_membership {
 .grid.medium div.accept_or_cancel_membership a, .grid.medium div.cancel_membership a {
     display:inline;
 }
+
+ul.invite_contacts {
+    height: 200px;
+/*    width: 55%;*/
+    overflow: auto;
+}
+ul.invite_contacts li {
+    background: none;
+}
+
+ul.invite_contacts li input.check{
+    margin-right: 10px;
+}

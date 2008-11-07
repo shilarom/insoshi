@@ -1,4 +1,11 @@
 class MembershipsController < ApplicationController
+  before_filter :login_required
+  before_filter :authorize_person, :only => [:edit, :update, :destroy]
+  
+  
+  def edit
+    @membership = Membership.find(params[:id])
+  end
   
   def create
     @group = Group.find(params[:group_id])
@@ -17,6 +24,24 @@ class MembershipsController < ApplicationController
         flash[:notice] = "Invalid membership"
         format.html { redirect_to(home_url) }
       end
+    end
+  end
+  
+  def update
+    
+    respond_to do |format|
+      membership = @membership
+      name = membership.group.name
+      case params[:commit]
+      when "Accept"
+        @membership.accept
+        flash[:notice] = %(Accepted membership with
+                           <a href="#{group_path(@membership.group)}">#{name}</a>)
+      when "Decline"
+        @membership.breakup
+        flash[:notice] = "Declined membership for #{name}"
+      end
+      format.html { redirect_to(home_url) }
     end
   end
   
@@ -50,89 +75,26 @@ class MembershipsController < ApplicationController
     end
   end
   
+  private 
   
-  
-#  # GET /memberships
-#  # GET /memberships.xml
-#  def index
-#    @memberships = Membership.find(:all)
-#
-#    respond_to do |format|
-#      format.html # index.html.erb
-#      format.xml  { render :xml => @memberships }
-#    end
-#  end
-#
-#  # GET /memberships/1
-#  # GET /memberships/1.xml
-#  def show
-#    @membership = Membership.find(params[:id])
-#
-#    respond_to do |format|
-#      format.html # show.html.erb
-#      format.xml  { render :xml => @membership }
-#    end
-#  end
-#
-#  # GET /memberships/new
-#  # GET /memberships/new.xml
-#  def new
-#    @membership = Membership.new
-#
-#    respond_to do |format|
-#      format.html # new.html.erb
-#      format.xml  { render :xml => @membership }
-#    end
-#  end
-#
-#  # GET /memberships/1/edit
-#  def edit
-#    @membership = Membership.find(params[:id])
-#  end
-#
-#  # POST /memberships
-#  # POST /memberships.xml
-#  def create
-#    @membership = Membership.new(params[:membership])
-#
-#    respond_to do |format|
-#      if @membership.save
-#        flash[:notice] = 'Membership was successfully created.'
-#        format.html { redirect_to(@membership) }
-#        format.xml  { render :xml => @membership, :status => :created, :location => @membership }
-#      else
-#        format.html { render :action => "new" }
-#        format.xml  { render :xml => @membership.errors, :status => :unprocessable_entity }
-#      end
-#    end
-#  end
-#
-#  # PUT /memberships/1
-#  # PUT /memberships/1.xml
-#  def update
-#    @membership = Membership.find(params[:id])
-#
-#    respond_to do |format|
-#      if @membership.update_attributes(params[:membership])
-#        flash[:notice] = 'Membership was successfully updated.'
-#        format.html { redirect_to(@membership) }
-#        format.xml  { head :ok }
-#      else
-#        format.html { render :action => "edit" }
-#        format.xml  { render :xml => @membership.errors, :status => :unprocessable_entity }
-#      end
-#    end
-#  end
-#
-#  # DELETE /memberships/1
-#  # DELETE /memberships/1.xml
-#  def destroy
-#    @membership = Membership.find(params[:id])
-#    @membership.destroy
-#
-#    respond_to do |format|
-#      format.html { redirect_to(memberships_url) }
-#      format.xml  { head :ok }
-#    end
-#  end
+  # Make sure the current person is correct for this connection.
+    def authorize_person
+      @membership = Membership.find(params[:id],
+                                    :include => [:person, :group])
+#                                  debugger
+      unless params[:invitation].blank?
+        unless current_person?(@membership.group.owner)
+          flash[:error] = "Invalid connection1."
+          redirect_to home_url
+        end
+      else
+        unless current_person?(@membership.person)
+          flash[:error] = "Invalid connection2."
+          redirect_to home_url
+        end
+      end
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Invalid or expired membership request"
+      redirect_to home_url
+    end
 end

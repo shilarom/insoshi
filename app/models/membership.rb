@@ -9,7 +9,7 @@ class Membership < ActiveRecord::Base
   
   # Status codes.
   ACCEPTED  = 0
-  REQUESTED = 1
+  INVITED   = 1
   PENDING   = 2
   
   # Accept a membership request (instance method).
@@ -58,13 +58,34 @@ class Membership < ActiveRecord::Base
       end
     end
     
+    def invite(person, group, send_mail = nil)
+      if send_mail.nil?
+        send_mail = global_prefs.email_notifications? &&
+                    group.owner.connection_notifications?
+      end
+      if person.groups.include?(group) or Membership.exists?(person, group)
+        nil
+      else
+        transaction do
+          create(:person => person, :group => group, :status => INVITED)
+        end
+#        if send_mail
+#          # The order here is important: the mail is sent *to* the contact,
+#          # so the connection should be from the contact's point of view.
+#          connection = conn(contact, person)
+#          PersonMailer.deliver_connection_request(connection)
+#        end
+        true
+      end
+    end
+    
     # Accept a membership request.
     def accept(person, group)
       transaction do
         accepted_at = Time.now
         accept_one_side(person, group, accepted_at)
       end
-      unless [person, group].include?(Person.find_first_admin)
+      unless Group.find(group).hidden?
         log_activity(mem(person, group))
       end
     end
@@ -92,6 +113,10 @@ class Membership < ActiveRecord::Base
       exist?(person, group) and mem(person,group).status == PENDING
     end
     
+    def invited?(person, group)
+      exist?(person, group) and mem(person,group).status == INVITED
+    end
+    
   end
   
   private
@@ -105,7 +130,6 @@ class Membership < ActiveRecord::Base
     end
   
     def log_activity(membership)
-#      debugger
       activity = Activity.create!(:item => membership, :person => membership.person)
       add_activities(:activity => activity, :person => membership.person)
     end

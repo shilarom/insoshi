@@ -4,7 +4,7 @@ class Group < ActiveRecord::Base
   validates_presence_of :name, :person_id
   
   has_many :photos, :dependent => :destroy, :order => "created_at"
-  has_many :memberships
+  has_many :memberships, :dependent => :destroy
   has_many :people, :through => :memberships, 
     :conditions => "status = 0", :order => "name DESC"
   has_many :pending_request, :through => :memberships, :source => "person",
@@ -48,6 +48,10 @@ class Group < ActiveRecord::Base
   
   def owner?(person)
     self.owner == person
+  end
+  
+  def has_invited?(person)
+    Membership.invited?(person,self)
   end
   
   ## Photo helpers
