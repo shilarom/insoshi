@@ -13,6 +13,7 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
+    @contacts = contacts_to_invite
     group_redirect_if_not_public 
   end
 
@@ -67,10 +68,14 @@ class GroupsController < ApplicationController
   
   def invite
     @group = Group.find(params[:id])
-    @contacts = 
-      current_person.contacts - Membership.find_all_by_group_id(current_person.own_hidden_groups).collect{|x| x.person}
+    @contacts = contacts_to_invite
+
     respond_to do |format|
       if current_person.own_groups.include?(@group) and @group.hidden?
+        if @contacts.length == 0
+          flash[:error] = "You have no contacts or you have invited all of them"
+          format.html { redirect_to(group_path(@group)) }
+        end
         format.html
       else
         format.html { redirect_to(group_path(@group)) }
@@ -80,7 +85,7 @@ class GroupsController < ApplicationController
   
   def invite_them
     @group = Group.find(params[:id])
-    invitations = params[:checkbox].collect{|x| x if  x[1]=="1" }.compact!
+    invitations = params[:checkbox].collect{|x| x if  x[1]=="1" }.compact
     invitations.each do |invitation|
       if Membership.find_all_by_group_id(@group, :conditions => ['person_id = ?',invitation[0].to_i]).empty?
         Membership.invite(Person.find(invitation[0].to_i),@group)
@@ -159,17 +164,21 @@ class GroupsController < ApplicationController
   
   private
   
+  def contacts_to_invite
+    current_person.contacts - 
+      Membership.find_all_by_group_id(current_person.own_hidden_groups).collect{|x| x.person}
+  end
+  
   def group_owner
     redirect_to home_url unless current_person == Group.find(params[:id]).owner
   end
   
   def group_redirect_if_not_public
     respond_to do |format|
-      if @group.public? or @group.private? or current_person.admin?
-          format.html 
-      elsif @group.owner?(current_person) or 
-          (@group.hidden? and @group.people.include?(current_person)) or 
-          @group.has_invited?(current_person)
+      #FIXME:it must be another way to do this if
+      if @group.public? or @group.private? or current_person.admin? or 
+          @group.owner?(current_person) or @group.has_invited?(current_person)
+          (@group.hidden? and @group.people.include?(current_person))
         format.html
       else
         format.html { redirect_to(groups_path) }

@@ -4,7 +4,7 @@ class Membership < ActiveRecord::Base
   
   belongs_to :group
   belongs_to :person
-  has_many :activities, :foreign_key => "item_id", :dependent => :destroy
+  has_many :activities, :foreign_key => "item_id" #, :dependent => :destroy
   validates_presence_of :person_id, :group_id
   
   # Status codes.

@@ -79,7 +79,7 @@
     <%= render :partial => "people", 
                :locals => {:members => (@group.pending_request), :title => "pending request"} %>
   <% end %>
-  <% if @group.public? or @group.owner?(current_person) %>
+  <% if @group.public? or @group.owner?(current_person) or current_person.admin? %>
     <%= render :partial => "people", 
                :locals => {:members => @group.people, :title => "members"} %>
   <% end %>

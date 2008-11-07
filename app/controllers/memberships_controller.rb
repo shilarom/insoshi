@@ -1,6 +1,6 @@
 class MembershipsController < ApplicationController
   before_filter :login_required
-  before_filter :authorize_person, :only => [:edit, :update, :destroy]
+  before_filter :authorize_person, :only => [:edit, :update, :destroy, :suscribe, :unsuscribe]
   
   
   def edit
@@ -81,15 +81,14 @@ class MembershipsController < ApplicationController
     def authorize_person
       @membership = Membership.find(params[:id],
                                     :include => [:person, :group])
-#                                  debugger
-      unless params[:invitation].blank?
+      if  !params[:invitation].blank? or params[:action] == 'suscribe' or params[:action] == 'unsuscribe'
         unless current_person?(@membership.group.owner)
-          flash[:error] = "Invalid connection1."
+          flash[:error] = "Invalid connection."
           redirect_to home_url
         end
       else
         unless current_person?(@membership.person)
-          flash[:error] = "Invalid connection2."
+          flash[:error] = "Invalid connection."
           redirect_to home_url
         end
       end
@@ -97,4 +96,5 @@ class MembershipsController < ApplicationController
       flash[:error] = "Invalid or expired membership request"
       redirect_to home_url
     end
+
 end
