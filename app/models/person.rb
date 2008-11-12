@@ -1,9 +1,9 @@
 # == Schema Information
-# Schema version: 28
+# Schema version: 20080916002106
 #
 # Table name: people
 #
-#  id                         :integer(11)     not null, primary key
+#  id                         :integer(4)      not null, primary key
 #  email                      :string(255)     
 #  name                       :string(255)     
 #  remember_token             :string(255)     
@@ -12,9 +12,9 @@
 #  remember_token_expires_at  :datetime        
 #  last_contacted_at          :datetime        
 #  last_logged_in_at          :datetime        
-#  forum_posts_count          :integer(11)     default(0), not null
-#  blog_post_comments_count   :integer(11)     default(0), not null
-#  wall_comments_count        :integer(11)     default(0), not null
+#  forum_posts_count          :integer(4)      default(0), not null
+#  blog_post_comments_count   :integer(4)      default(0), not null
+#  wall_comments_count        :integer(4)      default(0), not null
 #  created_at                 :datetime        
 #  updated_at                 :datetime        
 #  admin                      :boolean(1)      not null
@@ -24,6 +24,8 @@
 #  wall_comment_notifications :boolean(1)      default(TRUE)
 #  blog_comment_notifications :boolean(1)      default(TRUE)
 #  email_verified             :boolean(1)      
+#  avatar_id                  :integer(4)      
+#  identity_url               :string(255)     
 #
 
 class Person < ActiveRecord::Base
@@ -35,7 +37,7 @@ class Person < ActiveRecord::Base
   attr_accessible :email, :password, :password_confirmation, :name,
                   :description, :connection_notifications,
                   :message_notifications, :wall_comment_notifications,
-                  :blog_comment_notifications
+                  :blog_comment_notifications, :identity_url
   # Indexed fields for Sphinx
   is_indexed :fields => [ 'name', 'description', 'deactivated',
                           'email_verified'],
@@ -52,6 +54,7 @@ class Person < ActiveRecord::Base
   NUM_WALL_COMMENTS = 10
   NUM_RECENT = 8
   FEED_SIZE = 10
+  MAX_DEFAULT_CONTACTS = 12
   TIME_AGO_FOR_MOSTLY_ACTIVE = 1.month.ago
   # These constants should be methods, but I couldn't figure out how to use
   # methods in the has_many associations.  I hope you can do better.
@@ -84,9 +87,17 @@ class Person < ActiveRecord::Base
                     :conditions => "recipient_deleted_at IS NULL"
   end
   has_many :feeds
-  has_many :activities, :through => :feeds, :order => 'created_at DESC',
-                                            :limit => FEED_SIZE
+  has_many :activities, :through => :feeds, :order => 'activities.created_at DESC',
+                                            :limit => FEED_SIZE,
+                                            :conditions => ["people.deactivated = ?", false],
+                                            :include => :person
+
   has_many :page_views, :order => 'created_at DESC'
+
+  has_many :galleries
+  has_many :events
+  has_many :event_attendees
+  has_many :attendee_events, :through => :event_attendees, :source => :event
   
   has_many :own_groups, :class_name => "Group", :foreign_key => "person_id",
     :order => "name ASC"
@@ -113,8 +124,9 @@ class Person < ActiveRecord::Base
                             :with => EMAIL_REGEX,
                             :message => "must be a valid email address"
   validates_uniqueness_of   :email
+  validates_uniqueness_of   :identity_url, :allow_nil => true
 
-  before_create :create_blog
+  before_create :create_blog, :check_config_for_deactivation
   before_save :encrypt_password
   before_validation :prepare_email, :handle_nil_description
   after_create :connect_to_admin
@@ -191,7 +203,7 @@ class Person < ActiveRecord::Base
 
   # Return some contacts for the home page.
   def some_contacts
-    contacts[(0...12)]
+    contacts[(0...MAX_DEFAULT_CONTACTS)]
   end
   
   def requested_memberships
@@ -241,11 +253,27 @@ class Person < ActiveRecord::Base
                  :limit => NUM_RECENT_MESSAGES)
   end
 
-  ## Photo helpers
+  ## Forum helpers
+  def forum_posts
+    Topic.find(:all,
+               :conditions => [%(forum_id =? AND
+                                 person_id = ?), 1, id])
+  end
 
+  def has_unread_messages?
+    sql = %(recipient_id = :id
+            AND sender_id != :id
+            AND recipient_deleted_at IS NOT NULL
+            AND recipient_read_at IS NULL)
+    conditions = [sql, { :id => id }]
+    Message.count(:all, :conditions => conditions) > 0
+  end
+
+  ## Photo helpers
+  
   def photo
-    # This should only have one entry, but be paranoid.
-    photos.find_all_by_primary(true).first
+    # This should only have one entry, but use 'first' to be paranoid.
+    photos.find_all_by_avatar(true).first
   end
 
   # Return all the photos other than the primary one
@@ -283,7 +311,7 @@ class Person < ActiveRecord::Base
   # Authenticates a user by their email address and unencrypted password.
   # Returns the user or nil.
   def self.authenticate(email, password)
-    u = find_by_email(email.downcase.strip) # need to get the salt
+    u = find_by_email_and_identity_url(email.downcase.strip, nil) # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
 
@@ -368,20 +396,10 @@ class Person < ActiveRecord::Base
   end
 
   # Return the common connections with the given person.
-  def common_contacts_with(contact, page = 1)
-    sql = %(SELECT DISTINCT contact_id FROM connections
-            INNER JOIN people contact ON connections.contact_id = contact.id
-            WHERE ((person_id = ? OR person_id = ?)
-                   AND status = ? AND
-                   contact.deactivated = ? AND
-                   (contact.email_verified IS NULL
-                    OR contact.email_verified = ?)))
-    conditions = [sql, id, contact.id, Connection::ACCEPTED, false, true]
-    opts = { :page => page, :per_page => RASTER_PER_PAGE }
-    connections = 
-    @common_contacts ||= Person.find(Connection.
-                                     paginate_by_sql(conditions, opts).
-                                     map(&:contact_id)).paginate
+  def common_contacts_with(other_person, options = {})
+    # I tried to do this in SQL for efficiency, but failed miserably.
+    # Horrifyingly, MySQL lacks support for the INTERSECT keyword.
+    (contacts & other_person.contacts).paginate(options)
   end
   
   protected
@@ -406,6 +424,12 @@ class Person < ActiveRecord::Base
     def encrypt_password
       return if password.blank?
       self.crypted_password = encrypt(password)
+    end
+
+    def check_config_for_deactivation
+      if Person.global_prefs.whitelist?
+        self.deactivated = true
+      end
     end
 
     def set_old_description
@@ -440,7 +464,8 @@ class Person < ActiveRecord::Base
     ## Other private method(s)
 
     def password_required?
-      crypted_password.blank? || !password.blank? || !verify_password.nil?
+      (crypted_password.blank? && identity_url.nil?) || !password.blank? ||
+      !verify_password.nil?
     end
     
     class << self

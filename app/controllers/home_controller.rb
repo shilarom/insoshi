@@ -17,6 +17,7 @@ class HomeController < ApplicationController
     end    
     respond_to do |format|
       format.html
+      format.atom
     end  
   end
 end

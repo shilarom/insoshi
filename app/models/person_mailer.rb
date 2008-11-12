@@ -27,7 +27,7 @@ class PersonMailer < ActionMailer::Base
   def connection_request(connection)
     from         "Contact request <connection@#{domain}>"
     recipients   connection.person.email
-    subject      formatted_subject("New contact request")
+    subject      formatted_subject("Contact request from #{connection.contact.name}")
     body         "domain" => server,
                  "connection" => connection,
                  "url" => edit_connection_path(connection),
@@ -123,8 +123,6 @@ class PersonMailer < ActionMailer::Base
     end
   
     def preferences_note(person)
-      %(To change your email notification preferences, visit
-      
-http://#{server}/people/#{person.to_param}/edit)
+      %(To change your email notification preferences, visit http://#{server}/people/#{person.to_param}/edit#email_prefs)
     end
 end
