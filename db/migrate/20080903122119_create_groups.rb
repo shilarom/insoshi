@@ -9,13 +9,6 @@ class CreateGroups < ActiveRecord::Migration
       t.timestamps
     end
     
-    create_table :groups_people, :id => false do |t|
-      t.integer :group_id
-      t.integer :person_id
-      
-      t.timestamps
-    end
-    
     add_column :photos, :group_id, :integer
   end
 

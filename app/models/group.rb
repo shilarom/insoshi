@@ -6,7 +6,7 @@ class Group < ActiveRecord::Base
   has_many :photos, :dependent => :destroy, :order => "created_at"
   has_many :memberships, :dependent => :destroy
   has_many :people, :through => :memberships, 
-    :conditions => "status = 0", :order => "name DESC"
+    :conditions => "status = 0", :order => "name ASC"
   has_many :pending_request, :through => :memberships, :source => "person",
     :conditions => "status = 2", :order => "name DESC"
   

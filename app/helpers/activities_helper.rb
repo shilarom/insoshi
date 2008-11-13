@@ -219,7 +219,7 @@ module ActivitiesHelper
               "check.gif"
             when "Group"
               # TODO: replace with a png icon
-              "new.gif"
+              "asterisk_yellow.png"
             when "Membership"
               # TODO: replace with a png icon
               "add.gif"
