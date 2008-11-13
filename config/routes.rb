@@ -8,14 +8,27 @@ ActionController::Routing::Routes.draw do |map|
                  :save_photo => :post,
                  :delete_photo => :delete
                  }
+
+  map.resources :categories
+  map.resources :links
+  map.resources :events, :member => { :attend => :get, 
+                                      :unattend => :get } do |event|
+    event.resources :comments
+  end
+
   map.resources :preferences
   map.resources :companies
   map.resources :searches
   map.resources :activities
   map.resources :connections
   map.resources :password_reminders
-  map.resources :photos
+  map.resources :photos,
+                :member => { :set_primary => :put, :set_avatar => :put }
+  map.open_id_complete 'session', :controller => "sessions",
+                                  :action => "create",
+                                  :requirements => { :method => :get }
   map.resource :session
+  map.resource :galleries
   map.resources :messages, :collection => { :sent => :get, :trash => :get },
                            :member => { :reply => :get, :undestroy => :put }
 
@@ -28,9 +41,13 @@ ActionController::Routing::Routes.draw do |map|
                     :delete_company => :delete,
                     :groups => :get, :admin_groups => :get} do |person|
      person.resources :messages
-     person.resources :photos
+     person.resources :galleries
      person.resources :connections
      person.resources :comments
+  end
+  
+  map.resources :galleries do |gallery|
+    gallery.resources :photos
   end
   map.namespace :admin do |admin|
     admin.resources :people, :preferences, :groups

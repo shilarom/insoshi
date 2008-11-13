@@ -11,6 +11,11 @@ class TopicsController < ApplicationController
   def show
     @topic = Topic.find(params[:id])
     @posts = @topic.posts
+    
+    respond_to do |format|
+      format.html
+      format.atom
+    end
   end
 
   def new
@@ -26,7 +31,8 @@ class TopicsController < ApplicationController
   end
 
   def create
-    @topic = @forum.topics.new(params[:topic].merge(:person => current_person))
+    @topic = @forum.topics.new(params[:topic])
+    @topic.person = current_person
 
     respond_to do |format|
       if @topic.save

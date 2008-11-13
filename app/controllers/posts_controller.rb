@@ -2,6 +2,7 @@
 # There is some trickery to handle the two in a unified manner.
 class PostsController < ApplicationController
   include ApplicationHelper
+  include BlogsHelper
   
   before_filter :login_required
   before_filter :get_instance_vars
@@ -155,10 +156,12 @@ class PostsController < ApplicationController
     # Return a new post for the given resource.
     def new_resource_post
       if forum?
-        @post = @topic.posts.new(params[:post].merge(:person => current_person))
+        post = @topic.posts.build(params[:post])
+        post.person = current_person
       elsif blog?
-        @post = @blog.posts.new(params[:post])
-      end      
+        post = @blog.posts.new(params[:post])
+      end
+      post
     end
     
     # Return the template for the current resource given the name.
@@ -194,7 +197,8 @@ class PostsController < ApplicationController
       if forum?
        forum_topic_url(@forum, @topic)
       elsif blog?
-        blog_url(@blog)
+        blog_tab_url(@blog)
+        # person_url(@blog.person, :anchor => "tBlog")
       end      
     end
 

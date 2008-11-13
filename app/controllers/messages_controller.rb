@@ -1,9 +1,7 @@
 class MessagesController < ApplicationController
 
   before_filter :login_required, :setup
-  before_filter :authenticate_person, :only => [:show]
-  before_filter :handle_cancel, :only => [:create]
-  before_filter :validate_reply, :only => [:create]
+  before_filter :authenticate_person, :only => :show
 
   # GET /messages
   def index
@@ -52,10 +50,11 @@ class MessagesController < ApplicationController
   def reply
     original_message = Message.find(params[:id])
     recipient = original_message.other_person(current_person)
-    @message = Message.new(:parent_id    => original_message.id,
-                           :subject   => original_message.subject,
-                           :sender    => current_person,
-                           :recipient => recipient)
+    @message = Message.unsafe_build(:parent_id    => original_message.id,
+                                    :subject      => original_message.subject,
+                                    :sender       => current_person,
+                                    :recipient    => recipient)
+
     @recipient = not_current_person(original_message)
     respond_to do |format|
       format.html { render :action => "new" }
@@ -63,8 +62,14 @@ class MessagesController < ApplicationController
   end
 
   def create
-    @message = Message.new(params[:message].merge(:sender => current_person,
-                                                  :recipient => @recipient))
+    @message = Message.new(params[:message])
+    @recipient = Person.find(params[:person_id])
+    @message.sender    = current_person
+    @message.recipient = @recipient
+    if reply?
+      @message.parent = Message.find(params[:message][:parent_id])
+      redirect_to home_url and return unless @message.valid_reply?
+    end
   
     respond_to do |format|
       if !preview? and @message.save
@@ -117,23 +122,9 @@ class MessagesController < ApplicationController
         redirect_to login_url
       end
     end
-
-    def handle_cancel
-      redirect_to messages_url if params[:commit] == "Cancel"
-    end
-    
-    def validate_reply
-      @recipient = Person.find(params[:person_id])
-      redirect_to home_url if reply? and not valid_reply?(@recipient)
-    end
-    
+        
     def reply?
-      !params[:parent_id].nil?
-    end
-
-    def valid_reply?(recipient)
-      original = Message.find(params[:parent_id])
-      original.recipient == current_person and original.sender == recipient
+      not params[:message][:parent_id].nil?
     end
     
     # Return the proper recipient for a message.

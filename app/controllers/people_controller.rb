@@ -2,7 +2,8 @@ class PeopleController < ApplicationController
   
   skip_before_filter :require_activation, :only => :verify_email
   skip_before_filter :admin_warning, :only => [ :show, :update ]
-  before_filter :login_required, :only => [ :show, :edit, :update ]
+  before_filter :login_required, :only => [ :show, :edit, :update,
+                                            :common_contacts ]
   before_filter :correct_user_required, :only => [ :edit, :update ]
   before_filter :setup
   
@@ -22,7 +23,15 @@ class PeopleController < ApplicationController
     end
     if logged_in?
       @some_contacts = @person.some_contacts
-      @common_contacts = current_person.common_contacts_with(@person)
+      page = params[:page]
+      @common_contacts = current_person.common_contacts_with(@person,
+                                                             :page => page)
+      # Use the same max number as in basic contacts list.
+      num_contacts = Person::MAX_DEFAULT_CONTACTS
+      @some_common_contacts = @common_contacts[0...num_contacts]
+      @blog = @person.blog
+      @posts = @person.blog.posts.paginate(:page => params[:page])
+      @galleries = @person.galleries.paginate(:page => params[:page])
       @groups = @person.groups
       @own_groups = @person.own_groups
     end
@@ -30,7 +39,7 @@ class PeopleController < ApplicationController
       format.html
     end
   end
-  
+
   def new
     @body = "register single-col"
     @person = Person.new
@@ -45,8 +54,10 @@ class PeopleController < ApplicationController
     @person = Person.new(params[:person])
     respond_to do |format|
       @person.email_verified = false if global_prefs.email_verifications?
+      @person.identity_url = session[:verified_identity_url]
       @person.save
       if @person.errors.empty?
+        session[:verified_identity_url] = nil
         if global_prefs.email_verifications?
           @person.email_verifications.create
           flash[:notice] = %(Thanks for signing up! Check your email
@@ -59,11 +70,22 @@ class PeopleController < ApplicationController
         end
       else
         @body = "register single-col"
-        format.html { render :action => 'new' }
+        format.html { if @person.identity_url.blank? 
+                        render :action => 'new'
+                      else
+                        render :partial => "shared/personal_details.html.erb", :object => @person, :layout => 'application'
+                      end
+                    }
       end
     end
   rescue ActiveRecord::StatementInvalid
     # Handle duplicate email addresses gracefully by redirecting.
+    redirect_to home_url
+  rescue ActionController::InvalidAuthenticityToken
+    # Experience has shown that the vast majority of these are bots
+    # trying to spam the system, so catch & log the exception.
+    warning = "ActionController::InvalidAuthenticityToken: #{params.inspect}"
+    logger.warn warning
     redirect_to home_url
   end
 
@@ -122,7 +144,7 @@ class PeopleController < ApplicationController
   def common_contacts
     @person = Person.find(params[:id])
     @common_contacts = @person.common_contacts_with(current_person,
-                                                          params[:page])
+                                                    :page => params[:page])
     respond_to do |format|
       format.html
     end
