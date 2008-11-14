@@ -4,9 +4,7 @@ class GroupsController < ApplicationController
     :new_photo, :save_photo, :delete_photo]
   
   def index
-    @groups = Group.paginate(:page => params[:page],
-                    :conditions => ["mode in (?)", "0,1"],
-                    :per_page => RASTER_PER_PAGE)
+    @groups = Group.not_hidden(params[:page])
 
     respond_to do |format|
       format.html
@@ -15,10 +13,10 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
-
-    respond_to do |format|
-      format.html
-    end
+    num_contacts = Person::MAX_DEFAULT_CONTACTS
+    @members = @group.people
+    @some_members = @members[0...num_contacts]
+    group_redirect_if_not_public 
   end
 
   def new
@@ -66,26 +64,37 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       flash[:notice] = 'Group was successfully deleted.'
-      format.html { redirect_to(groups_path()) }
+      format.html { redirect_to(groups_path) }
     end
   end
   
-  def join
+  def invite
     @group = Group.find(params[:id])
-    current_person.groups << @group
+    @contacts = contacts_to_invite
+
     respond_to do |format|
-      flash[:notice] = 'Joined to group.'
-      format.html { redirect_to(group_path(@group)) }
+      if current_person.own_groups.include?(@group) and @group.hidden?
+        if @contacts.length == 0
+          flash[:error] = "You have no contacts or you have invited all of them"
+          format.html { redirect_to(group_path(@group)) }
+        end
+        format.html
+      else
+        format.html { redirect_to(group_path(@group)) }
+      end
     end
   end
   
-  def leave
+  def invite_them
     @group = Group.find(params[:id])
-    if current_person.groups.include?(@group)
-      flash[:notice] = 'You have left the group.'
-      current_person.groups.delete(@group)
+    invitations = params[:checkbox].collect{|x| x if  x[1]=="1" }.compact
+    invitations.each do |invitation|
+      if Membership.find_all_by_group_id(@group, :conditions => ['person_id = ?',invitation[0].to_i]).empty?
+        Membership.invite(Person.find(invitation[0].to_i),@group)
+      end
     end
     respond_to do |format|
+      flash[:notice] = "You have invite some of your contacts to '#{@group.name}'"
       format.html { redirect_to(group_path(@group)) }
     end
   end
@@ -94,10 +103,8 @@ class GroupsController < ApplicationController
     @group = Group.find(params[:id])
     @members = @group.people.paginate(:page => params[:page],
                                           :per_page => RASTER_PER_PAGE)
-    
-    respond_to do |format|
-      format.html
-    end
+    @pending = @group.pending_request
+    group_redirect_if_not_public
   end
   
   def photos
@@ -158,8 +165,26 @@ class GroupsController < ApplicationController
   
   private
   
+  def contacts_to_invite
+    current_person.contacts - 
+      Membership.find_all_by_group_id(current_person.own_hidden_groups).collect{|x| x.person}
+  end
+  
   def group_owner
     redirect_to home_url unless current_person == Group.find(params[:id]).owner
+  end
+  
+  def group_redirect_if_not_public
+    respond_to do |format|
+      #FIXME:it must be another way to do this if
+      if @group.public? or @group.private? or current_person.admin? or 
+          @group.owner?(current_person) or @group.has_invited?(current_person) or
+          (@group.hidden? and @group.people.include?(current_person))
+        format.html
+      else
+        format.html { redirect_to(groups_path) }
+      end
+    end
   end
   
 end

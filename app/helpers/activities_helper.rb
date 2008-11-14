@@ -109,7 +109,9 @@ module ActivitiesHelper
     when "CompanyPerson"
       %(#{person_link(person)} has joined to '#{company_tree(activity.item.company)}')
     when "Group"
-      %(#{person_link(person)} created the new group '#{group_link(Group.find(activity.item))}')
+      %(#{person_link(person)} created the group '#{group_link(Group.find(activity.item))}')
+    when "Membership"
+      %(#{person_link(person)} joined the group '#{group_link(Group.find(activity.item.group))}')
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -174,7 +176,9 @@ module ActivitiesHelper
     when "CompanyPerson"
       %(#{person_link(person)} has joined to '#{company_tree(activity.item.company)}')
     when "Group"
-      %(#{person_link(person)} created the new group '#{group_link(Group.find(activity.item))}')
+      %(#{person_link(person)} created the group '#{group_link(Group.find(activity.item))}')
+    when "Membership"
+      %(#{person_link(person)} joined the group '#{group_link(Group.find(activity.item.group))}')
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -220,6 +224,10 @@ module ActivitiesHelper
             when "CompanyPerson"
                 "bargraph.gif"
             when "Group"
+              # TODO: replace with a png icon
+              "asterisk_yellow.png"
+            when "Membership"
+              # TODO: replace with a png icon
               "add.gif"
             else
               raise "Invalid activity type #{activity_type(activity).inspect}"

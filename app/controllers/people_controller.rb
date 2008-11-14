@@ -4,7 +4,7 @@ class PeopleController < ApplicationController
   skip_before_filter :admin_warning, :only => [ :show, :update ]
   before_filter :login_required, :only => [ :show, :edit, :update,
                                             :common_contacts ]
-  before_filter :correct_user_required, :only => [ :edit, :update ]
+  before_filter :correct_user_required, :only => [ :edit, :update, :invitations ]
   before_filter :setup
   
   def index
@@ -32,8 +32,10 @@ class PeopleController < ApplicationController
       @blog = @person.blog
       @posts = @person.blog.posts.paginate(:page => params[:page])
       @galleries = @person.galleries.paginate(:page => params[:page])
-      @groups = @person.groups
-      @own_groups = @person.own_groups
+      @groups = current_person == @person ? @person.groups : @person.groups_not_hidden
+      @some_groups = @groups[0...num_contacts]
+      @own_groups = current_person == @person ? @person.own_groups : @person.own_not_hidden_groups
+      @some_own_groups = @own_groups[0...num_contacts]
     end
     respond_to do |format|
       format.html
@@ -183,7 +185,8 @@ class PeopleController < ApplicationController
     
   def groups
     @person = Person.find(params[:id])
-    @groups = @person.groups
+    @groups = current_person == @person ? @person.groups : @person.groups_not_hidden
+    @some_groups = @groups.paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
     
     respond_to do |format|
       format.html
@@ -192,7 +195,8 @@ class PeopleController < ApplicationController
   
   def admin_groups
     @person = Person.find(params[:id])
-    @groups = @person.own_groups
+    @groups = current_person == @person ? @person.own_groups : @person.own_not_hidden_groups
+    @some_groups = @groups.paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
     render :action => :groups
   end
   

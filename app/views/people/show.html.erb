@@ -19,6 +19,11 @@
     <%= render :partial => 'profile_contacts' %>
     <div class="clear"></div>
   <% end %>
+  
+  <% tabs.create('tGroups', 'Groups') do %>
+    <%= render :partial => 'profile_groups' %>
+    <div class="clear"></div>
+  <% end %>
 
   <% tabs.create('tBlog', 'Blog') do %>
     <%= render :partial => 'shared/blog' %>

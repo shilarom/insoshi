@@ -4,7 +4,11 @@ class Group < ActiveRecord::Base
   validates_presence_of :name, :person_id
   
   has_many :photos, :dependent => :destroy, :order => "created_at"
-  has_and_belongs_to_many :people, :order => "name DESC"
+  has_many :memberships, :dependent => :destroy
+  has_many :people, :through => :memberships, 
+    :conditions => "status = 0", :order => "name ASC"
+  has_many :pending_request, :through => :memberships, :source => "person",
+    :conditions => "status = 2", :order => "name DESC"
   
   belongs_to :owner, :class_name => "Person", :foreign_key => "person_id"
   
@@ -19,8 +23,38 @@ class Group < ActiveRecord::Base
   PRIVATE = 1
   HIDDEN = 2
   
-  ## Photo helpers
+  class << self
 
+    # Return not hidden groups
+    def not_hidden(page = 1)
+      paginate(:all, :page => page,
+                     :per_page => RASTER_PER_PAGE,
+                     :conditions => ["mode = ? OR mode = ?", PUBLIC,PRIVATE],
+                     :order => "name ASC")
+    end
+  end
+  
+  def public?
+    self.mode == PUBLIC
+  end
+  
+  def private?
+    self.mode == PRIVATE
+  end
+  
+  def hidden?
+    self.mode == HIDDEN
+  end
+  
+  def owner?(person)
+    self.owner == person
+  end
+  
+  def has_invited?(person)
+    Membership.invited?(person,self)
+  end
+  
+  ## Photo helpers
   def photo
     # This should only have one entry, but be paranoid.
     photos.find_all_by_primary(true).first
@@ -60,8 +94,10 @@ class Group < ActiveRecord::Base
   private
   
   def log_activity
-    activity = Activity.create!(:item => self, :person => Person.find(self.person_id))
-    add_activities(:activity => activity, :person => Person.find(self.person_id))
+    if not self.hidden?
+      activity = Activity.create!(:item => self, :person => Person.find(self.person_id))
+      add_activities(:activity => activity, :person => Person.find(self.person_id))
+    end
   end
   
 end

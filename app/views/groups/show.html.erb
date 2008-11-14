@@ -1,57 +1,21 @@
-<%- column_div :type => :primary do -%>
-  <div class="profile vcard">
-    <h2>Group: <span class="fn n"><%= h @group.name %></span></h2>
-    <%- if group_owner?(current_person,@group) -%>
-      <%- if @group.description.blank? -%>
-        <div class="error">
-          The group description is blank.
-          <%= link_to "Click here to add a description",
-                      edit_group_path(@group) %>
-        </div>
-      <%- else -%>
-        <div class="notice">
-          You are viewing your group.
-          <%= link_to "Click here to edit it", edit_group_path(@group) %>
-        </div>
-      <%- end -%>
-    <%- end -%>
-    <div class="toolbox">
-      <%= image_tag @group.main_photo, :class => "profile-image photo",
-                                        :alt => h(@group.name) %>
-      <ul class="tools">
-        <li>
-          <%- unless group_owner?(current_person,@group) -%>
-            <%- unless current_person.groups.include?(@group) -%>
-              <%= link_to "Join to group",
-                      join_group_path(@group), :method => :post %>
-            <%- else -%>
-              <%= link_to "Leave group",
-                      leave_group_path(@group), :method => :post %>
-            <%- end -%>
-          <%- else -%>
-            You are group's admin
-            <%= link_to "(delete it)", group_path(@group), :confirm => 'Are you sure?', :method => :delete %>
-          <%- end -%>
-        </li>
-        <%- if current_person.admin? -%>
-          <li>
-          <%= link_to "delete group",
-                admin_group_path(@group),:confirm => 'Are you sure?', :method => :delete%> 
-          </li>
-        <%- end -%>
-      </ul>
-    </div>
-    <%= display @group.description %>
-  </div>
-  
-  
-<%- end -%>
+<div id="profile" style="display: none;">
+  <% tabs = TabsRenderer.new(self, :id => "tabCol") %>
+  <% tabs.create('tProfile', 'Profile', :class => "profile vcard") do %>
+    <%= render :partial => 'profile' %>
+    <div class="clear"></div>
+  <% end %>
 
+  <% tabs.create('tMembers', 'Members') do %>
+    <%= render :partial => 'profile_members' %>
+    <div class="clear"></div>
+  <% end %>
 
-<%- column_div :type => :secondary do -%>
-  <%= render :partial => 'searches/box' %>
-  <%= render :partial => "people", 
-             :locals => {:members => @group.people, :title => "members"} %>
-  <%= render :partial => "people", 
-             :locals => {:members => ([] << @group.owner), :title => "admin"} %>
-<%- end -%>
+  <%= tabs.render %>
+</div>
+<script type='text/javascript'>
+  $(document).ready(function() {
+    // Set up the tabs.
+    $("#tabCol > ul").tabs();
+    $("#profile").show();
+  })
+</script>
