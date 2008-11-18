@@ -3,7 +3,7 @@ class Group < ActiveRecord::Base
   
   validates_presence_of :name, :person_id
   
-  has_many :photos, :dependent => :destroy, :order => "created_at"
+  has_many :photos, :as => :photoable, :dependent => :destroy, :order => "created_at"
   has_many :memberships, :dependent => :destroy
   has_many :people, :through => :memberships, 
     :conditions => "status = 0", :order => "name ASC"
@@ -14,7 +14,9 @@ class Group < ActiveRecord::Base
   
   has_many :activities, :foreign_key => "item_id", :dependent => :destroy
   
-  after_save :log_activity
+  has_many :galleries, :as => :galleryable
+  
+  after_create :log_activity
   
   is_indexed :fields => [ 'name', 'description']
   
@@ -57,7 +59,7 @@ class Group < ActiveRecord::Base
   ## Photo helpers
   def photo
     # This should only have one entry, but be paranoid.
-    photos.find_all_by_primary(true).first
+    photos.find_all_by_avatar(true).first
   end
 
   # Return all the photos other than the primary one

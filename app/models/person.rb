@@ -75,7 +75,7 @@ class Person < ActiveRecord::Base
   has_many :contacts, :through => :connections,
                       :conditions => ACCEPTED_AND_ACTIVE,
                       :order => 'people.name ASC'
-  has_many :photos, :dependent => :destroy, :order => 'created_at'
+  has_many :photos, :as => :photoable, :dependent => :destroy, :order => 'created_at'
   has_many :requested_contacts, :through => :connections,
            :source => :contact,
            :conditions => REQUESTED_AND_ACTIVE
@@ -94,7 +94,7 @@ class Person < ActiveRecord::Base
 
   has_many :page_views, :order => 'created_at DESC'
 
-  has_many :galleries
+  has_many :galleries, :as => :galleryable
   has_many :events
   has_many :event_attendees
   has_many :attendee_events, :through => :event_attendees, :source => :event

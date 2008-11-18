@@ -3,9 +3,10 @@
 
   <% if @group.people.count > Person::MAX_DEFAULT_CONTACTS or group_owner?(current_person,@group) %>
     <div class='button_container'>
-      <%= link_to "All members", members_group_path(@group) %>
       <%- if group_owner?(current_person,@group) -%>
-        | <%= link_to "Edit members", members_group_path(@group) %>
+        <%= link_to "Edit all members", members_group_path(@group) %>
+      <%- else -%>
+        <%= link_to "All members", members_group_path(@group) %>
       <%- end -%>
     </div>
   <% end %>

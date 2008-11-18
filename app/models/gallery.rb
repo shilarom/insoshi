@@ -18,7 +18,8 @@ class Gallery < ActiveRecord::Base
   
   attr_accessible :title, :description
   
-  belongs_to :person
+  belongs_to :galleryable, :polymorphic => true
+  
   has_many :photos, :dependent => :destroy, :order => :position
   has_many :activities, :foreign_key => "item_id", :dependent => :destroy,
                         :conditions => "item_type = 'Gallery'"
@@ -26,7 +27,7 @@ class Gallery < ActiveRecord::Base
 
   validates_length_of :title, :maximum => 255, :allow_nil => true
   validates_length_of :description, :maximum => 1000, :allow_nil => true
-  validates_presence_of :person_id
+  validates_presence_of :galleryable_id
 
   before_create :handle_nil_description
   after_create :log_activity
@@ -78,7 +79,13 @@ class Gallery < ActiveRecord::Base
     end
 
     def log_activity
-      activity = Activity.create!(:item => self, :person => person)
-      add_activities(:activity => activity, :person => person)
+      if Person.find(galleryable.id) == galleryable
+        activity = Activity.create!(:item => self, :person => galleryable)
+        add_activities(:activity => activity, :person => galleryable)
+      else
+        #FIXME: to do it activities must be polymorphic
+#        activity = Activity.create!(:item => self, :group => galleryable)
+#        add_activities(:activity => activity, :group => galleryable)
+      end
     end
 end

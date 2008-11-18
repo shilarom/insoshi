@@ -9,6 +9,11 @@
     <%= render :partial => 'profile_members' %>
     <div class="clear"></div>
   <% end %>
+  
+  <% tabs.create('tGalleries', 'Galleries') do %>
+    <%= render :partial => 'shared/galleries' %>
+    <div class="clear"></div>
+  <% end %>
 
   <%= tabs.render %>
 </div>
