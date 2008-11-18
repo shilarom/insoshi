@@ -3,7 +3,7 @@ class Group < ActiveRecord::Base
   
   validates_presence_of :name, :person_id
   
-  has_many :photos, :as => :photoable, :dependent => :destroy, :order => "created_at"
+  has_many :photos, :as => :owner, :dependent => :destroy, :order => "created_at"
   has_many :memberships, :dependent => :destroy
   has_many :people, :through => :memberships, 
     :conditions => "status = 0", :order => "name ASC"
@@ -14,7 +14,7 @@ class Group < ActiveRecord::Base
   
   has_many :activities, :foreign_key => "item_id", :dependent => :destroy
   
-  has_many :galleries, :as => :galleryable
+  has_many :galleries, :as => :owner
   
   after_create :log_activity
   

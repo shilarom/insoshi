@@ -29,7 +29,7 @@ class Photo < ActiveRecord::Base
   # attr_protected instead.
   attr_protected :id, :parent_id, :created_at, :updated_at
   
-  belongs_to :photoable, :polymorphic => true
+  belongs_to :owner, :polymorphic => true
   
   has_attachment :content_type => :image,
                  :storage => :file_system,
@@ -48,7 +48,7 @@ class Photo < ActiveRecord::Base
                         :dependent => :destroy
     
   validates_length_of :title, :maximum => 255, :allow_nil => true
-  validates_presence_of :photoable_id
+  validates_presence_of :owner_id
   validates_presence_of :gallery_id
   
   after_create :log_activity
@@ -85,9 +85,9 @@ class Photo < ActiveRecord::Base
   end
   
   def log_activity
-    if Person.find(photoable.id) == photoable
-      activity = Activity.create!(:item => self, :person => photoable)
-      add_activities(:activity => activity, :person => photoable)
+    if Person.find(owner.id) == owner
+      activity = Activity.create!(:item => self, :person => owner)
+      add_activities(:activity => activity, :person => owner)
     else
       #FIXME: to do it activities must be polymorphic
 #      activity = Activity.create!(:item => self, :person => person)

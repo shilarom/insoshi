@@ -9,19 +9,19 @@
     <% end %>
   
     <p>
-      <% if @gallery.galleryable_type == "Person" %>
-        <% if current_person?(@gallery.galleryable)%>
+      <% if @gallery.owner_type == "Person" %>
+        <% if current_person?(@gallery.owner)%>
           <%= link_to "Add photo", new_gallery_photo_path(@gallery) %> |
           <%= link_to "Edit gallery", edit_gallery_path %> |
         <% end %>
-        <%= link_to "All galleries", person_path(@gallery.galleryable,
+        <%= link_to "All galleries", person_path(@gallery.owner,
                                      :anchor => 'tGalleries') %>
       <% else %>
-        <% if current_person.own_groups.include?(@gallery.galleryable)%>
+        <% if current_person.own_groups.include?(@gallery.owner)%>
           <%= link_to "Add photo", new_gallery_photo_path(@gallery) %> |
           <%= link_to "Edit gallery", edit_gallery_path %> |
         <% end %>
-        <%= link_to "All galleries", group_path(@gallery.galleryable,
+        <%= link_to "All galleries", group_path(@gallery.owner,
                                      :anchor => 'tGalleries') %>
       <% end %>
     </p>

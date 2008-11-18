@@ -48,9 +48,9 @@ class GalleriesController < ApplicationController
   
   def destroy
     gallery = Gallery.find(params[:id])
-    galleryable = gallery.galleryable
-    galleryable_type = gallery.galleryable_type
-    if galleryable.galleries.count == 1
+    owner = gallery.owner
+    owner_type = gallery.owner_type
+    if owner.galleries.count == 1
       flash[:error] = "You can't delete the final gallery"
     elsif gallery.destroy
       flash[:success] = "Gallery successfully deleted"
@@ -59,10 +59,10 @@ class GalleriesController < ApplicationController
     end
 
     respond_to do |format|
-      if galleryable_type == "Person"
+      if owner_type == "Person"
         format.html { redirect_to person_galleries_path(current_person) }
       else
-        format.html { redirect_to group_galleries_path(galleryable) }
+        format.html { redirect_to group_galleries_path(owner) }
       end
     end
 
@@ -92,14 +92,14 @@ class GalleriesController < ApplicationController
       if @gallery.nil?
         flash[:error] = "No gallery found"
         redirect_to person_galleries_path(current_person)
-      elsif @gallery.galleryable_type == "Person"
-        if @gallery.galleryable != current_person 
+      elsif @gallery.owner_type == "Person"
+        if @gallery.owner != current_person 
           flash[:error] = "You are not the owner of this gallery"
-          redirect_to person_galleries_path(@gallery.galleryable)
+          redirect_to person_galleries_path(@gallery.owner)
         end
-      elsif !current_person.own_groups.include?(@gallery.galleryable)
+      elsif !current_person.own_groups.include?(@gallery.owner)
         flash[:error] = "You are not the owner of this gallery"
-        redirect_to person_galleries_path(@gallery.galleryable)
+        redirect_to person_galleries_path(@gallery.owner)
       end
     end
 end

@@ -45,8 +45,8 @@ class PhotosController < ApplicationController
       redirect_to gallery_path(Gallery.find(params[:gallery_id])) and return
     end
 
-    photo_data = params[:photo].merge(:photoable_id => @gallery.galleryable.id, 
-        :photoable_type => @gallery.galleryable_type)
+    photo_data = params[:photo].merge(:owner_id => @gallery.owner.id,
+        :owner_type => @gallery.owner_type)
 
     @photo = @gallery.photos.build(photo_data)
 
@@ -86,10 +86,10 @@ class PhotosController < ApplicationController
   def set_primary
     @photo = Photo.find(params[:id])
     if @photo.nil? or @photo.primary?
-      if @photo.photoable_type == "Person"
+      if @photo.owner_type == "Person"
         redirect_to person_galleries_path(current_person) and return
       else
-        redirect_to group_galleries_path(@photo.photoable) and return
+        redirect_to group_galleries_path(@photo.owner) and return
       end
     end
     # This should only have one entry, but be paranoid.
@@ -97,11 +97,11 @@ class PhotosController < ApplicationController
     respond_to do |format|
       if @photo.update_attributes(:primary => true)
         @old_primary.each { |p| p.update_attributes!(:primary => false) }
-        if @photo.photoable_type == "Person"
+        if @photo.owner_type == "Person"
           format.html { redirect_to(person_galleries_path(current_person)) }
           flash[:success] = "Gallery thumbnail set"
         else
-          format.html { redirect_to(group_galleries_path(@photo.photoable)) }
+          format.html { redirect_to(group_galleries_path(@photo.owner)) }
           flash[:success] = "Gallery thumbnail set"
         end
       else
@@ -116,19 +116,19 @@ class PhotosController < ApplicationController
   def set_avatar
     @photo = Photo.find(params[:id])
     if @photo.nil? or @photo.avatar?
-      if @photo.photoable_type == "Person"
+      if @photo.owner_type == "Person"
         redirect_to current_person and return
       else
-        redirect_to @photo.photoable and return
+        redirect_to @photo.owner and return
       end
     end
     # This should only have one entry, but be paranoid.
-    @old_primary = @photo.photoable.photos.select(&:avatar?)
+    @old_primary = @photo.owner.photos.select(&:avatar?)
   
     respond_to do |format|
       if @photo.update_attributes!(:avatar => true)
         @old_primary.each { |p| p.update_attributes!(:avatar => false) }
-        format.html { redirect_to(@photo.photoable) }
+        format.html { redirect_to(@photo.owner) }
         flash[:success] = "Profile photo set"
       else    
         format.html do
@@ -145,11 +145,11 @@ class PhotosController < ApplicationController
       @photo = Photo.find(params[:id])
       if @photo.nil?
         redirect_to home_url
-      elsif @photo.photoable_type == "Person"
-        if !current_person?(@photo.photoable)
+      elsif @photo.owner_type == "Person"
+        if !current_person?(@photo.owner)
           redirect_to home_url
         end
-      elsif !current_person.own_groups.include?(@photo.photoable)
+      elsif !current_person.own_groups.include?(@photo.owner)
       end
     end
     
@@ -159,14 +159,14 @@ class PhotosController < ApplicationController
         redirect_to home_path
       else
         @gallery = Gallery.find(params[:gallery_id])
-        if @gallery.galleryable_type == "Person"
-          if @gallery.galleryable != current_person 
+        if @gallery.owner_type == "Person"
+          if @gallery.owner != current_person 
             flash[:error] = "You cannot add photos to this gallery"
-            redirect_to person_galleries_path(@gallery.galleryable)
+            redirect_to person_galleries_path(@gallery.owner)
           end
-        elsif !current_person.own_groups.include?(@gallery.galleryable)
+        elsif !current_person.own_groups.include?(@gallery.owner)
           flash[:error] = "You are not the owner of this gallery"
-          redirect_to person_galleries_path(@gallery.galleryable)
+          redirect_to person_galleries_path(@gallery.owner)
         end
       end
     end
