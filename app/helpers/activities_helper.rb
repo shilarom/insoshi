@@ -107,9 +107,18 @@ module ActivitiesHelper
         #{someones(event.person, owner)} event: 
         #{event_link(event.title, event)}.) 
     when "Group"
-      %(#{person_link(owner)} created the group '#{group_link(Group.find(activity.item))}')
+      if owner.class.to_s == "Group"
+        %(description changed)
+      else
+        %(#{person_link(owner)} created the group '#{group_link(Group.find(activity.item))}')
+      end
     when "Membership"
-      %(#{person_link(owner)} joined the group '#{group_link(Group.find(activity.item.group))}')
+      if owner.class.to_s == "Group"
+        %(#{person_link(Person.find(activity.item.person))} joined the group)
+      else
+        %(#{person_link(owner)} joined the group '#{group_link(Group.find(activity.item.group))}')
+      end
+      
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -172,7 +181,11 @@ module ActivitiesHelper
       %(#{person_link(owner)} is attending
         #{someones(event.person, owner)} #{event_link("event", event)}.)
     when "Group"
-      %(#{person_link(owner)} created the group '#{group_link(Group.find(activity.item))}')
+      if owner.class.to_s == "Group"
+        %(description changed)
+      else
+        %(#{person_link(owner)} created the group '#{group_link(Group.find(activity.item))}')
+      end
     when "Membership"
       %(#{person_link(owner)} joined the group '#{group_link(Group.find(activity.item.group))}')
     else
@@ -218,8 +231,13 @@ module ActivitiesHelper
               # TODO: replace with a png icon
               "check.gif"
             when "Group"
-              # TODO: replace with a png icon
-              "asterisk_yellow.png"
+              if activity.owner.class.to_s == "Group"
+                # TODO: replace with a group_edit png icon
+                "user_edit.png"
+              else
+                # TODO: replace with a group png icon
+                "asterisk_yellow.png"
+              end
             when "Membership"
               # TODO: replace with a png icon
               "add.gif"

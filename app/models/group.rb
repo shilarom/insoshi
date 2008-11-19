@@ -12,11 +12,14 @@ class Group < ActiveRecord::Base
   
   belongs_to :owner, :class_name => "Person", :foreign_key => "person_id"
   
-  has_many :activities, :as => :owner, :foreign_key => "item_id", :dependent => :destroy
+  has_many :activities, :as => :owner, :conditions => ["owner_type = ?","Group"],
+    :foreign_key => "item_id", :dependent => :destroy
   
   has_many :galleries, :as => :owner
   
   after_create :log_activity
+  before_update :set_old_description
+  after_update :log_activity_description_changed
   
   is_indexed :fields => [ 'name', 'description']
   
@@ -34,6 +37,12 @@ class Group < ActiveRecord::Base
                      :conditions => ["mode = ? OR mode = ?", PUBLIC,PRIVATE],
                      :order => "name ASC")
     end
+  end
+  
+  def recent_activity
+    Activity.find_all_by_owner_id(self, :order => 'created_at DESC',
+                                        :conditions => "owner_type = 'Group'",
+                                         :limit => 10)
   end
   
   def public?
@@ -94,6 +103,16 @@ class Group < ActiveRecord::Base
   
   
   private
+  
+  def set_old_description
+    @old_description = Group.find(self).description
+  end
+
+  def log_activity_description_changed
+    unless @old_description == description or description.blank?
+      add_activities(:item => self, :owner => self)
+    end
+  end
   
   def log_activity
     if not self.hidden?

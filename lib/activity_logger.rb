@@ -15,9 +15,11 @@ module ActivityLogger
     include_person = options[:include_person]
     activity = options[:activity] ||
                Activity.create!(:item => options[:item], :owner => owner)
-     
-    people_ids = people_to_add(owner, activity, include_person)
-    do_feed_insert(people_ids, activity.id) unless people_ids.empty?
+    
+    if owner.class.to_s == "Person"
+      people_ids = people_to_add(owner, activity, include_person)
+      do_feed_insert(people_ids, activity.id) unless people_ids.empty?
+    end
   end
   
   private

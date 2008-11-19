@@ -79,13 +79,7 @@ class Gallery < ActiveRecord::Base
     end
 
     def log_activity
-      if Person.find(owner.id) == owner
-        activity = Activity.create!(:item => self, :owner => owner)
-        add_activities(:activity => activity, :owner => owner)
-      else
-        #FIXME: to do it activities must be polymorphic
-#        activity = Activity.create!(:item => self, :group => owner)
-#        add_activities(:activity => activity, :group => owner)
-      end
+      activity = Activity.create!(:item => self, :owner => owner)
+      add_activities(:activity => activity, :owner => owner)
     end
 end

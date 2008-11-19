@@ -4,7 +4,7 @@ class Membership < ActiveRecord::Base
   
   belongs_to :group
   belongs_to :person
-  has_many :activities, :foreign_key => "item_id" #, :dependent => :destroy
+  has_many :activities, :foreign_key => "item_id", :dependent => :destroy
   validates_presence_of :person_id, :group_id
   
   # Status codes.
@@ -130,6 +130,8 @@ class Membership < ActiveRecord::Base
     def log_activity(membership)
       activity = Activity.create!(:item => membership, :owner => membership.person)
       add_activities(:activity => activity, :owner => membership.person)
+      activity = Activity.create!(:item => membership, :owner => membership.group)
+      add_activities(:activity => activity, :owner => membership.group)
     end
   end
   

@@ -5,6 +5,11 @@
     <div class="clear"></div>
   <% end %>
 
+  <% tabs.create('tActivity', 'Recent Activity') do %>
+    <%= render :partial => 'recent_activity' %>
+    <div class="clear"></div>
+  <% end %>
+
   <% tabs.create('tMembers', 'Members') do %>
     <%= render :partial => 'profile_members' %>
     <div class="clear"></div>
