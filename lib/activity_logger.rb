@@ -11,12 +11,12 @@ module ActivityLogger
   # we should include the owner as well, so that he sees in his feed
   # that a comment has been made.
   def add_activities(options = {})
-    person = options[:person]
+    owner = options[:owner]
     include_person = options[:include_person]
     activity = options[:activity] ||
-               Activity.create!(:item => options[:item], :person => person)
+               Activity.create!(:item => options[:item], :owner => owner)
      
-    people_ids = people_to_add(person, activity, include_person)
+    people_ids = people_to_add(owner, activity, include_person)
     do_feed_insert(people_ids, activity.id) unless people_ids.empty?
   end
   

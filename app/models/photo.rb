@@ -86,8 +86,8 @@ class Photo < ActiveRecord::Base
   
   def log_activity
     if Person.find(owner.id) == owner
-      activity = Activity.create!(:item => self, :person => owner)
-      add_activities(:activity => activity, :person => owner)
+      activity = Activity.create!(:item => self, :owner => owner)
+      add_activities(:activity => activity, :owner => owner)
     else
       #FIXME: to do it activities must be polymorphic
 #      activity = Activity.create!(:item => self, :person => person)

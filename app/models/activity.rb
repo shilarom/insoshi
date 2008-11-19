@@ -13,8 +13,7 @@
 #
 
 class Activity < ActiveRecord::Base
-  belongs_to :person
-  belongs_to :group
+  belongs_to :owner, :polymorphic => true
   belongs_to :item, :polymorphic => true
   has_many :feeds, :dependent => :destroy
   

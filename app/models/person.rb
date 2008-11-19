@@ -87,10 +87,11 @@ class Person < ActiveRecord::Base
                     :conditions => "recipient_deleted_at IS NULL"
   end
   has_many :feeds
-  has_many :activities, :through => :feeds, :order => 'activities.created_at DESC',
-                                            :limit => FEED_SIZE,
-                                            :conditions => ["people.deactivated = ?", false],
-                                            :include => :person
+  #FIXME: how can I do to make this function?
+#  has_many :activities, :through => :feeds, :order => 'activities.created_at DESC',
+#                                            :limit => FEED_SIZE,
+#                                            :conditions => ["people.deactivated = ?", false],
+#                                            :include => :people
 
   has_many :page_views, :order => 'created_at DESC'
 
@@ -181,7 +182,18 @@ class Person < ActiveRecord::Base
   end
 
   ## Feeds
-
+  
+  #FIXME: it's done to replace the "has many :activities"
+  def activities
+    feeds.find(:all, :include => [:person,:activity], 
+      :order => 'activities.created_at DESC', :limit => FEED_SIZE, 
+      :conditions => ["people.deactivated = ?",false]).collect{|x| x.activity}
+#    has_many :activities, :through => :feeds, :order => 'activities.created_at DESC',
+#                                            :limit => FEED_SIZE,
+#                                            :conditions => ["people.deactivated = ?", false],
+#                                            :include => :people
+  end
+  
   # Return a person-specific activity feed.
   def feed
     len = activities.length
@@ -195,7 +207,8 @@ class Person < ActiveRecord::Base
   end
 
   def recent_activity
-    Activity.find_all_by_person_id(self, :order => 'created_at DESC',
+    Activity.find_all_by_owner_id(self, :order => 'created_at DESC',
+                                        :conditions => "owner_type = 'Person'",
                                          :limit => FEED_SIZE)
   end
 
@@ -438,7 +451,7 @@ class Person < ActiveRecord::Base
 
     def log_activity_description_changed
       unless @old_description == description or description.blank?
-        add_activities(:item => self, :person => self)
+        add_activities(:item => self, :owner => self)
       end
     end
     

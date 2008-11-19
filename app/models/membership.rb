@@ -128,8 +128,8 @@ class Membership < ActiveRecord::Base
     end
   
     def log_activity(membership)
-      activity = Activity.create!(:item => membership, :person => membership.person)
-      add_activities(:activity => activity, :person => membership.person)
+      activity = Activity.create!(:item => membership, :owner => membership.person)
+      add_activities(:activity => activity, :owner => membership.person)
     end
   end
   

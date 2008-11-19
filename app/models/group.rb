@@ -12,7 +12,7 @@ class Group < ActiveRecord::Base
   
   belongs_to :owner, :class_name => "Person", :foreign_key => "person_id"
   
-  has_many :activities, :foreign_key => "item_id", :dependent => :destroy
+  has_many :activities, :as => :owner, :foreign_key => "item_id", :dependent => :destroy
   
   has_many :galleries, :as => :owner
   
@@ -97,8 +97,8 @@ class Group < ActiveRecord::Base
   
   def log_activity
     if not self.hidden?
-      activity = Activity.create!(:item => self, :person => Person.find(self.person_id))
-      add_activities(:activity => activity, :person => Person.find(self.person_id))
+      activity = Activity.create!(:item => self, :owner => Person.find(self.person_id))
+      add_activities(:activity => activity, :owner => Person.find(self.person_id))
     end
   end
   
