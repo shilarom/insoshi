@@ -4,6 +4,11 @@
     <%= render :partial => 'profile' %>
     <div class="clear"></div>
   <% end %>
+  
+  <% tabs.create('tWall', 'Wall') do %>
+    <%= render :partial => 'wall' %>
+    <div class="clear"></div>
+  <% end %>
 
   <% tabs.create('tActivity', 'Recent Activity') do %>
     <%= render :partial => 'recent_activity' %>

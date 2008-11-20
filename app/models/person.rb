@@ -463,6 +463,10 @@ class Person < ActiveRecord::Base
     def destroy_feeds
       Feed.find_all_by_person_id(self).each {|f| f.destroy}
     end
+    
+    def destroy_groups
+      Group.find_all_by_person_id(self).each {|g| g.destroy}
+    end
 
     # Connect new users to "Tom".
     def connect_to_admin

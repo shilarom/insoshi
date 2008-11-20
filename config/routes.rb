@@ -13,6 +13,7 @@ ActionController::Routing::Routes.draw do |map|
        :delete_photo => :delete } do |group|
    group.resources :memberships
    group.resources :galleries
+   group.resources :comments
  end
 
   map.resources :categories

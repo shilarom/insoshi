@@ -100,7 +100,7 @@ class Membership < ActiveRecord::Base
     end
     
     def accepted?(person, group)
-      mem(person, group).status == ACCEPTED
+      exist?(person, group) and mem(person, group).status == ACCEPTED
     end
     
     def connected?(person, group)

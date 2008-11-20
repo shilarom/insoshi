@@ -36,6 +36,13 @@ module ActivitiesHelper
           %(#{person_link_with_image(activity.item.commenter)}
             commented on #{wall(activity)})
         end
+      when "Group"
+        if recent
+          %(commented on group #{wall(activity)})
+        else
+          %(#{person_link_with_image(activity.item.commenter)}
+            commented on group #{wall(activity)})
+        end
       end
     when "Event"
       # TODO: make recent/long versions for this
@@ -149,6 +156,9 @@ module ActivitiesHelper
         event = activity.item.commentable
         %(#{person_link(activity.item.commenter)} commented on 
           #{someones(event.person, activity.item.commenter)} #{event_link("event", event)}.)
+      when "Group"
+        %(#{person_link_with_image(activity.item.commenter)}
+          commented on group #{wall(activity)})
       end
     when "Connection"
       if activity.item.contact.admin?
@@ -206,6 +216,8 @@ module ActivitiesHelper
               when "Event"
                 "comment.png"
               when "Person"
+                "sound.png"
+              when "Group"
                 "sound.png"
               end
             when "Connection"
@@ -304,9 +316,15 @@ module ActivitiesHelper
   # Return a link to the wall.
   def wall(activity)
     commenter = activity.owner
-    person = activity.item.commentable
-    link_to("#{someones(person, commenter, false)} wall",
-            person_path(person, :anchor => "tWall"))
+    if activity.item.commentable.class.to_s == "Person"
+      person = activity.item.commentable
+      link_to("#{someones(person, commenter, false)} wall",
+              person_path(person, :anchor => "tWall"))
+    else
+      group = activity.item.commentable
+      link_to("#{someones(group, commenter, false)} wall",
+              group_path(group, :anchor => "tWall"))
+    end
   end
   
   # Only show member photo for certain types of activity

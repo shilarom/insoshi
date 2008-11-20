@@ -3,6 +3,8 @@ class Group < ActiveRecord::Base
   
   validates_presence_of :name, :person_id
   
+  NUM_WALL_COMMENTS = 10
+  
   has_many :photos, :as => :owner, :dependent => :destroy, :order => "created_at"
   has_many :memberships, :dependent => :destroy
   has_many :people, :through => :memberships, 
@@ -15,7 +17,10 @@ class Group < ActiveRecord::Base
   has_many :activities, :as => :owner, :conditions => ["owner_type = ?","Group"],
     :foreign_key => "item_id", :dependent => :destroy
   
-  has_many :galleries, :as => :owner
+  has_many :galleries, :as => :owner, :dependent => :destroy
+  
+  has_many :comments, :as => :commentable, :order => 'created_at DESC',
+                      :limit => NUM_WALL_COMMENTS, :dependent => :destroy
   
   after_create :log_activity
   before_update :set_old_description
