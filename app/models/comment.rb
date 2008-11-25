@@ -47,7 +47,7 @@ class Comment < ActiveRecord::Base
                           when "Person"
                             commentable
                           when "BlogPost"
-                            commentable.blog.person
+                            commentable.blog.owner
                           when "Event"
                             commentable.person
                           end

@@ -66,7 +66,7 @@ class CommentsController < ApplicationController
       if wall?
         @person
       elsif blog?
-        @blog.person 
+        @blog.owner 
       elsif event?
         @event.person
       end

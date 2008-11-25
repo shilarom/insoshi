@@ -67,7 +67,7 @@ class Person < ActiveRecord::Base
                             (email_verified IS NULL OR email_verified = ?)),
                           Connection::REQUESTED, false, true]
 
-  has_one :blog
+  has_one :blog, :as => :owner
   has_many :email_verifications
   has_many :comments, :as => :commentable, :order => 'created_at DESC',
                       :limit => NUM_WALL_COMMENTS

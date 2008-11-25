@@ -102,7 +102,11 @@ class PostsController < ApplicationController
       if forum?
         true  # This will change once there are groups
       elsif blog?
-        redirect_to home_url unless current_person?(@blog.person)
+        if @blog.owner.class.to_s == "Person"
+          redirect_to home_url unless current_person?(@blog.owner)
+        else
+          redirect_to home_url unless current_person?(@blog.owner.owner)
+        end
       end
     end
 
@@ -112,8 +116,13 @@ class PostsController < ApplicationController
         authorized = current_person?(@post.person) || current_person.admin?
         redirect_to home_url unless authorized
       elsif blog?
-        authorized = current_person?(@blog.person) && valid_post?
-        redirect_to home_url unless authorized
+        if @blog.owner.class.to_s == "Person"
+          authorized = current_person?(@blog.owner) && valid_post?
+          redirect_to home_url unless authorized
+        else
+          authorized = current_person?(@blog.owner.owner) && valid_post?
+          redirect_to home_url unless authorized
+        end
       end
     end
     
@@ -198,7 +207,7 @@ class PostsController < ApplicationController
        forum_topic_url(@forum, @topic)
       elsif blog?
         blog_tab_url(@blog)
-        # person_url(@blog.person, :anchor => "tBlog")
+        # person_url(@blog.owner, :anchor => "tBlog")
       end      
     end
 

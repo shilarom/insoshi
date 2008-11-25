@@ -5,6 +5,7 @@ class Group < ActiveRecord::Base
   
   NUM_WALL_COMMENTS = 10
   
+  has_one :blog, :as => :owner
   has_many :photos, :as => :owner, :dependent => :destroy, :order => "created_at"
   has_many :memberships, :dependent => :destroy
   has_many :people, :through => :memberships, 
@@ -22,6 +23,7 @@ class Group < ActiveRecord::Base
   has_many :comments, :as => :commentable, :order => 'created_at DESC',
                       :limit => NUM_WALL_COMMENTS, :dependent => :destroy
   
+  before_create :create_blog
   after_create :log_activity
   before_update :set_old_description
   after_update :log_activity_description_changed

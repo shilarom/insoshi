@@ -22,11 +22,11 @@ module ActivitiesHelper
         post = activity.item.commentable
         blog = post.blog
         if recent
-          %(made a comment to #{someones(blog.person, owner)} blog post
+          %(made a comment to #{someones(blog.owner, owner)} blog post
             #{post_link(blog, post)})
         else
           %(#{person_link_with_image(owner)} made a comment to
-            #{someones(blog.person, owner)} blog post
+            #{someones(blog.owner, owner)} blog post
             #{post_link(blog, post)})
         end
       when "Person"
@@ -147,7 +147,7 @@ module ActivitiesHelper
         post = activity.item.commentable
         blog = post.blog
         %(#{person_link(owner)} made a comment on
-          #{someones(blog.person, owner)} 
+          #{someones(blog.owner, owner)} 
           #{post_link("blog post", post.blog, post)})
       when "Person"
         %(#{person_link(activity.item.commenter)} commented on 
