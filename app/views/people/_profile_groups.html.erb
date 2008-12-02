@@ -1,5 +1,8 @@
 <%- column_div :type => :primary do -%>
   <h2><%= @person.name %>'s Groups</h2>
+  <% if current_person?(@person) %>
+    <%= link_to "Add Group", new_group_path() %>
+  <% end %>
   <%= render :partial => 'groups', 
              :locals => {:groups => @groups, :some_groups => @some_groups,
                 :title => "Joined Groups", :link => "groups"} %>

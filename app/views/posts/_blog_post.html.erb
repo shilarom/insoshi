@@ -4,7 +4,8 @@
     <%= link_to sanitize(blog_post.title),
                 blog_post_path(@blog, blog_post),
                 :class => "show-follow" %>
-    <%- if current_person?(@blog.person) -%>
+    <%- if (@blog.owner.class.to_s == "Person" and current_person?(@blog.owner)) or
+    (@blog.owner.class.to_s == "Group" and current_person?(@blog.owner.owner)) -%>
       <%= link_to image_tag("icons/page_white_edit.png",
                             :class => 'actioner'),
                   edit_blog_post_path(@blog, blog_post) %>

@@ -12,6 +12,8 @@ ActionController::Routing::Routes.draw do |map|
        :save_photo => :post,
        :delete_photo => :delete } do |group|
    group.resources :memberships
+   group.resources :galleries
+   group.resources :comments
  end
 
   map.resources :categories
@@ -33,7 +35,6 @@ ActionController::Routing::Routes.draw do |map|
                                   :action => "create",
                                   :requirements => { :method => :get }
   map.resource :session
-  map.resource :galleries
   map.resources :messages, :collection => { :sent => :get, :trash => :get },
                            :member => { :reply => :get, :undestroy => :put }
 

@@ -13,9 +13,13 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
+    @parent = @group
     num_contacts = Person::MAX_DEFAULT_CONTACTS
     @members = @group.people
     @some_members = @members[0...num_contacts]
+    @blog = @group.blog
+    @posts = @group.blog.posts.paginate(:page => params[:page])
+    @galleries = @group.galleries.paginate(:page => params[:page])
     group_redirect_if_not_public 
   end
 
