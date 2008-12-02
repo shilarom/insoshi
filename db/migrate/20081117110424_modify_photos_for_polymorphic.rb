@@ -12,7 +12,7 @@ class ModifyPhotosForPolymorphic < ActiveRecord::Migration
 
   def self.down
     add_column :photos, :person_id, :integer
-    Gallery.find(:all).each do |photo|
+    Photo.find(:all).each do |photo|
       photo.person_id = photo.owner_id
       photo.save!
     end
