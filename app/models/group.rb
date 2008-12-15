@@ -12,6 +12,8 @@ class Group < ActiveRecord::Base
     :conditions => "status = 0", :order => "name ASC"
   has_many :pending_request, :through => :memberships, :source => "person",
     :conditions => "status = 2", :order => "name DESC"
+  has_many :pending_invitations, :through => :memberships, :source => "person",
+    :conditions => "status = 1", :order => "name DESC"
   
   belongs_to :owner, :class_name => "Person", :foreign_key => "person_id"
   
