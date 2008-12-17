@@ -170,8 +170,7 @@ class GroupsController < ApplicationController
   private
   
   def contacts_to_invite
-    current_person.contacts - 
-      Membership.find_all_by_group_id(current_person.own_hidden_groups).collect{|x| x.person}
+    current_person.contacts - @group.people  - @group.pending_invitations
   end
   
   def group_owner
