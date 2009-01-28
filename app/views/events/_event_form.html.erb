@@ -11,15 +11,11 @@
 </div>
 <div class="form_row">
   <%= f.label :start_time %>
-<%= calendar_date_select_tag "event[start_time]", @event.start_time||Time.now,
-                             :time => true, :size => 22,
-                             :valid_date_check => "date >= (new Date()).stripTime()" %>
+  <%= f.text_field :start_time %>
 </div>
 <div class="form_row">
   <%= f.label :end_time %>
-  <%= calendar_date_select_tag "event[end_time]", @event.end_time, :time => true, 
-                               :mixed => true, :size => 22,
-                               :valid_date_check => "date >= (new Date()).stripTime()" %>
+  <%= f.text_field :end_time %>
 </div>
 <div class="form_row full">
   <%= f.label :reminder %>
@@ -34,3 +30,22 @@
 </div>
 <% end %>
 
+
+<%= stylesheet_link_tag 'datepicker' %>
+<%= javascript_include_tag 'ui.core.js' %>
+<%= javascript_include_tag 'ui.datepicker.js' %>
+<%= javascript_include_tag 'i18n/ui.datepicker-es.js' %>
+
+<script>
+  $(document).ready(function(){
+    $('#event_start_time').datepicker({ minDate:"-10d", firstDay: 1, prevText: '&laquo;',nextText: '&raquo;'});
+    $('#event_start_time').datepicker("setDate",new Date($('#event_start_time').val().replace(/-/g,',')));
+    $('#event_end_time').datepicker({beforeShow: customRange, firstDay: 1, prevText: '&laquo;',nextText: '&raquo;'});
+    $('#event_end_time').datepicker("setDate",new Date($('#event_end_time').val().replace(/-/g,',')));
+    function customRange(input) {
+      return {
+        minDate: ( (input.id == 'event_end_time' ? $('#event_start_time').datepicker("getDate") : null) )};
+    }
+     $.datepicker.regional['es'];
+  });
+</script>
