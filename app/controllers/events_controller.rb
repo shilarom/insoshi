@@ -66,10 +66,10 @@ class EventsController < ApplicationController
 
   def update
     respond_to do |format|
-      @event.privacy = params[:event][:privacy].to_i
-      @event.start_time = params[:start_date].to_time
-      @event.end_time = params[:end_date].to_time
-      if @event.save
+      params[:event][:privacy] = params[:event][:privacy].to_i
+      params[:event][:start_time] = params[:start_date].to_time
+      params[:event][:end_time] = params[:end_date].to_time
+      if @event.update_attributes(params[:event])
         flash[:notice] = 'Event was successfully updated.'
         format.html { redirect_to(@event) }
         format.xml  { head :ok }
