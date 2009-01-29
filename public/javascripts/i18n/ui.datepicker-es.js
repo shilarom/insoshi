@@ -1,4 +1,4 @@
-/* Inicialización en español para la extensión 'UI date picker' para jQuery. */
+/* InicializaciÃ³n en espaÃ±ol para la extensiÃ³n 'UI date picker' para jQuery. */
 /* Traducido por Vester (xvester@gmail.com). */
 jQuery(function($){
 	$.datepicker.regional['es'] = {clearText: 'Limpiar', clearStatus: '',
@@ -16,7 +16,7 @@ jQuery(function($){
 		dayNamesShort: ['Dom','Lun','Mar','Mi&eacute;','Juv','Vie','S&aacute;b'],
 		dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','S&aacute;'],
 		dayStatus: 'DD', dateStatus: 'D, M d',
-		dateFormat: 'dd/mm/yy', firstDay: 0, 
+		dateFormat: 'dd/mm/yy', firstDay: 1,
 		initStatus: '', isRTL: false};
 	$.datepicker.setDefaults($.datepicker.regional['es']);
 });

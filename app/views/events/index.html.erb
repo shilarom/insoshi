@@ -10,16 +10,6 @@
 <% column_div :type => :secondary do -%>
   <%= render :partial => 'calendar',
              :locals => { :events => @month_events, :date => @date } %>
-  <div id="calendar2"></div>
-<%= stylesheet_link_tag 'datepicker' %>
-<%= javascript_include_tag 'ui.core.js' %>
-<%= javascript_include_tag 'ui.datepicker.js' %>
-<%= javascript_include_tag 'i18n/ui.datepicker-es.js' %>
-<script>
-  $(document).ready(function(){
-    $('#calendar2').datepicker({minDate:"-20d", firstDay: 1, prevText: '&laquo;',nextText: '&raquo;',rangeSelect: true }, $.datepicker.regional['es']);
-  });
-  </script>
 
   <h2>Add new event</h2>
   <%= link_to "Click here", new_event_path %>

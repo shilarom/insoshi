@@ -2,7 +2,6 @@ class EventsController < ApplicationController
 
 #  before_filter :in_progress unless test?
   before_filter :login_required
-  before_filter :admin_required, :only => [:new, :create, :edit, :update, :destroy]
   before_filter :load_event, :except => [:index, :new, :create]
   before_filter :load_date, :only => [:index, :show]
   before_filter :authorize_show, :only => :show
@@ -47,8 +46,12 @@ class EventsController < ApplicationController
   end
 
   def create
-    @event = Event.new(params[:event].merge(:person => current_person))
-
+    @event = Event.new(params[:event])
+    @event.person = current_person
+    @event.privacy = params[:event][:privacy].to_i
+    @event.start_time = params[:start_date].to_time
+    @event.end_time = params[:end_date].to_time
+    
     respond_to do |format|
       if @event.save
         flash[:notice] = 'Event was successfully created.'
@@ -63,7 +66,10 @@ class EventsController < ApplicationController
 
   def update
     respond_to do |format|
-      if @event.update_attributes(params[:event])
+      @event.privacy = params[:event][:privacy].to_i
+      @event.start_time = params[:start_date].to_time
+      @event.end_time = params[:end_date].to_time
+      if @event.save
         flash[:notice] = 'Event was successfully updated.'
         format.html { redirect_to(@event) }
         format.xml  { head :ok }

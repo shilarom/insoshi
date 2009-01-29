@@ -36,14 +36,20 @@ module ActivitiesHelper
           %(#{person_link_with_image(activity.item.commenter)}
             commented on #{wall(activity)})
         end
+      when "Event"
+        if recent
+          %(commented on #{event(activity)})
+        else
+          %(#{person_link_with_image(activity.item.commenter)}
+            commented on #{event(activity)})
+        end
       end
     when "Event"
       # TODO: make recent/long versions for this
-      event = activity.item.commentable
-      commenter = activity.item.commenter
-      %(#{person_link_with_image(commenter)} commented on 
-        #{someones(event.person, commenter)} event: 
-        #{event_link(event.title, event)}.)
+      event = activity.item
+      commenter = activity.item.person
+      %(#{person_link_with_image(commenter)} created the event:
+        #{event_link(event.title, event)} that starts the #{event.start_time.to_date}.)
     when "Connection"
       if activity.item.contact.admin?
         if recent
@@ -275,6 +281,15 @@ module ActivitiesHelper
     person = activity.item.commentable
     link_to("#{someones(person, commenter, false)} wall",
             person_path(person, :anchor => "tWall"))
+  end
+
+  # Return a link to the event.
+  def event(activity)
+    commenter = activity.person
+    event = activity.item.commentable
+#    debugger
+    link_to("'#{event.title}' event",
+            event_path(activity.item))
   end
   
   # Only show member photo for certain types of activity

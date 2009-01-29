@@ -12,10 +12,12 @@
 <div class="form_row">
   <%= f.label :start_time %>
   <%= f.text_field :start_time %>
+  <%= hidden_field_tag :start_date %>
 </div>
 <div class="form_row">
   <%= f.label :end_time %>
   <%= f.text_field :end_time %>
+  <%= hidden_field_tag :end_date %>
 </div>
 <div class="form_row full">
   <%= f.label :reminder %>
@@ -34,18 +36,34 @@
 <%= stylesheet_link_tag 'datepicker' %>
 <%= javascript_include_tag 'ui.core.js' %>
 <%= javascript_include_tag 'ui.datepicker.js' %>
+<%# FIXME: change the next line to become a property%>
 <%= javascript_include_tag 'i18n/ui.datepicker-es.js' %>
 
-<script>
-  $(document).ready(function(){
-    $('#event_start_time').datepicker({ minDate:"-10d", firstDay: 1, prevText: '&laquo;',nextText: '&raquo;'});
+<script type='text/javascript'>
+$(document).ready(function(){
+    $('#event_start_time').datepicker({ minDate:"-10d", onSelect:change_time});
     $('#event_start_time').datepicker("setDate",new Date($('#event_start_time').val().replace(/-/g,',')));
-    $('#event_end_time').datepicker({beforeShow: customRange, firstDay: 1, prevText: '&laquo;',nextText: '&raquo;'});
+    $('#event_end_time').datepicker({beforeShow:customRange,onSelect:change_time});
     $('#event_end_time').datepicker("setDate",new Date($('#event_end_time').val().replace(/-/g,',')));
+    $('#start_date').val($('#event_start_time').datepicker("getDate"));
+    $('#end_date').val($('#event_end_time').datepicker("getDate"));
+    $.datepicker.regional['es'];
+    
+    function change_time(dateText){
+        //if start_time bigger than end_time, will change end_time
+        start_date = $('#event_start_time').datepicker("getDate");
+        end_date = $('#event_end_time').datepicker("getDate");
+        if (start_date > end_date){
+          $('#event_end_time').datepicker("setDate",start_date);
+        }
+        $('#start_date').val($('#event_start_time').datepicker("getDate"));
+        $('#end_date').val($('#event_end_time').datepicker("getDate"));
+    }
+
     function customRange(input) {
       return {
-        minDate: ( (input.id == 'event_end_time' ? $('#event_start_time').datepicker("getDate") : null) )};
+        minDate: ( (input.id == 'event_end_time' ? $('#event_start_time').datepicker("getDate") : null) )
+      };
     }
-     $.datepicker.regional['es'];
-  });
+});
 </script>

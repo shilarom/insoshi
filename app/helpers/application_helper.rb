@@ -31,7 +31,7 @@ module ApplicationHelper
       #links = [home, profile, contacts, messages, blog, people, forum]
       links = [home, profile, messages, people, forum]
       # TODO: put this in once events are ready.
-      # links.push(events)
+       links.push(events)
       
     elsif logged_in? and admin_view?
       home =    menu_element("Home", home_path)
