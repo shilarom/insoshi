@@ -289,7 +289,7 @@ module ActivitiesHelper
     event = activity.item.commentable
 #    debugger
     link_to("'#{event.title}' event",
-            event_path(activity.item))
+            event_path(event))
   end
   
   # Only show member photo for certain types of activity
