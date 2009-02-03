@@ -49,8 +49,12 @@ class EventsController < ApplicationController
     @event = Event.new(params[:event])
     @event.person = current_person
     @event.privacy = params[:event][:privacy].to_i
-    @event.start_time = params[:start_date].to_time
-    @event.end_time = params[:end_date].to_time
+    @event.start_time = params[:date][:start].to_time +
+        params[:start][:hour].to_i.hours +
+        params[:start][:minute].to_i.minutes
+    @event.end_time = params[:date][:end].to_time +
+        params[:end][:hour].to_i.hours +
+        params[:end][:minute].to_i.minutes
     
     respond_to do |format|
       if @event.save
@@ -67,8 +71,12 @@ class EventsController < ApplicationController
   def update
     respond_to do |format|
       params[:event][:privacy] = params[:event][:privacy].to_i
-      params[:event][:start_time] = params[:start_date].to_time
-      params[:event][:end_time] = params[:end_date].to_time
+      params[:event][:start_time] = params[:date][:start].to_datetime +
+          params[:start][:hour].to_i.hours +
+          params[:start][:minute].to_i.minutes
+      params[:event][:end_time] = params[:date][:end].to_datetime +
+          params[:end][:hour].to_i.hours +
+          params[:end][:minute].to_i.minutes
       if @event.update_attributes(params[:event])
         flash[:notice] = 'Event was successfully updated.'
         format.html { redirect_to(@event) }

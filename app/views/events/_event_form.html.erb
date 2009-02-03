@@ -11,13 +11,15 @@
 </div>
 <div class="form_row">
   <%= f.label :start_time %>
-  <%= f.text_field :start_time %>
-  <%= hidden_field_tag :start_date %>
+  <%= f.text_field :start_time, :size => 10 %>
+  <%= select_time @event.start_time || Time.now, :time_separator => ':', :prefix => "start" %>
+  <%= hidden_field :date, :start %>
 </div>
 <div class="form_row">
   <%= f.label :end_time %>
-  <%= f.text_field :end_time %>
-  <%= hidden_field_tag :end_date %>
+  <%= f.text_field :end_time, :size => 10 %>
+  <%= select_time @event.end_time || Time.now, :time_separator => ':', :prefix => "end" %>
+  <%= hidden_field :date, :end %>
 </div>
 <div class="form_row full">
   <%= f.label :reminder %>
@@ -41,13 +43,27 @@
 
 <script type='text/javascript'>
 $(document).ready(function(){
-    $('#event_start_time').datepicker({ minDate:"-10d", onSelect:change_time});
-    $('#event_start_time').datepicker("setDate",new Date($('#event_start_time').val().replace(/-/g,',')));
-    $('#event_end_time').datepicker({beforeShow:customRange,onSelect:change_time});
-    $('#event_end_time').datepicker("setDate",new Date($('#event_end_time').val().replace(/-/g,',')));
-    $('#start_date').val($('#event_start_time').datepicker("getDate"));
-    $('#end_date').val($('#event_end_time').datepicker("getDate"));
-    $.datepicker.regional['es'];
+    $('#event_start_time').val(get_date_or_new("start"));
+    $('#event_end_time').val(get_date_or_new("end"));
+
+    $('#event_start_time').datepicker({
+      minDate:"-10d",
+      altField: '#date_start'
+    });
+    
+    $('#event_end_time').datepicker({
+      beforeShow:customRange,
+      altField: '#date_end'
+    });
+
+    //set defaults to all datepickers
+    $.datepicker.setDefaults({
+      onSelect:change_time,
+      altFormat: 'yy-mm-dd'
+    });
+
+    $('#date_start').val($('#event_start_time').datepicker("getDate"));
+    $('#date_end').val($('#event_end_time').datepicker("getDate"));
     
     function change_time(dateText){
         //if start_time bigger than end_time, will change end_time
@@ -56,9 +72,16 @@ $(document).ready(function(){
         if (start_date > end_date){
           $('#event_end_time').datepicker("setDate",start_date);
         }
-        $('#start_date').val($('#event_start_time').datepicker("getDate"));
-        $('#end_date').val($('#event_end_time').datepicker("getDate"));
     }
+
+    function get_date_or_new(start_end){
+      where = '#event_'+start_end+'_time';
+      if ($(where).val() != ''){
+        return(new Date($(where).val().replace(/-/g,',')).toLocaleDateString());
+      } else {
+        return (new Date().toLocaleDateString());
+      }
+    };
 
     function customRange(input) {
       return {
