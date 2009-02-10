@@ -1,8 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :categories
   map.resources :links
-  map.resources :events, :member => { :attend => :get, 
-                                      :unattend => :get } do |event|
+  map.resources :events, :member => { :attend => :get, :unattend => :get },
+                         :collection => {:geolocate => :get}  do |event|
     event.resources :comments
   end
 

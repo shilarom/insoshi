@@ -592,3 +592,12 @@ form#admin_preferences label {
     height: 50px;
     z-index: 2;
   }    
+
+.hidden {
+    visibility: hidden;
+}
+
+div#map_div {
+    width: 480px;
+    height: 240px;
+}

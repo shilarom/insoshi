@@ -2,12 +2,14 @@ class EventsController < ApplicationController
 
 #  before_filter :in_progress unless test?
   before_filter :login_required
-  before_filter :load_event, :except => [:index, :new, :create]
+  before_filter :load_event, :except => [:index, :new, :create, :geolocate]
   before_filter :load_date, :only => [:index, :show]
   before_filter :authorize_show, :only => :show
   before_filter :authorize_change, :only => [:edit, :update]
   before_filter :authorize_destroy, :only => :destroy
-  
+  require 'geokit'
+  include Geokit::Geocoders
+
   def index
     @month_events = Event.monthly_events(@date).person_events(current_person)
     unless filter_by_day?
@@ -94,6 +96,13 @@ class EventsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(events_url) }
       format.xml  { head :ok }
+    end
+  end
+
+  def geolocate
+    @location = MultiGeocoder.geocode(params[:address])
+    if @location.success
+      @coord = @location.to_a
     end
   end
 

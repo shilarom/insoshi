@@ -29,6 +29,22 @@
   <%= f.label :privacy %>
   <%= f.select :privacy, [["Public", Event::PRIVACY[:public]],["Me and my contacts", Event::PRIVACY[:contacts]]] %> 
 </div>
+
+<div class="form_row">
+  <%= label_tag "map", "Location" %>
+  <%= f.text_field :lat %>
+  <%= f.text_field :lng %>
+  <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=<%= Geokit::Geocoders::google %>"
+      type="text/javascript"></script>
+  <div id="map_div"></div>
+  <%= text_field_tag :address %>
+  <%= submit_to_remote 'geolocate_button', 'Geolocate',
+        :url => {:action => 'geolocate', :map => @map, :method => :get},
+        :after => '$("#loading").css("visibility","visible")',
+        :complete => '$("#loading").css("visibility","hidden")' %>
+   <%= image_tag "loading.gif", :id => "loading", :class => "hidden" %>
+</div>
+
 <div class="form_row">
   <%= f.submit @event.new_record? ? "Create" : "Update" %>
 </div>
@@ -40,6 +56,7 @@
 <%= javascript_include_tag 'ui.datepicker.js' %>
 <%# FIXME: change the next line to become a property%>
 <%= javascript_include_tag 'i18n/ui.datepicker-es.js' %>
+<%= javascript_include_tag 'gmaps.js' %>
 
 <script type='text/javascript'>
 $(document).ready(function(){
@@ -87,6 +104,14 @@ $(document).ready(function(){
       return {
         minDate: ( (input.id == 'event_end_time' ? $('#event_start_time').datepicker("getDate") : null) )
       };
+    };
+
+    //For Google Maps
+    initialize_map();
+    
+    if (parseFloat($('#event_lat').val()) != 0 && parseFloat($('#event_lng').val()) != 0){
+      addAddressToMap($('#event_lat').val(),$('#event_lng').val(),'Event Location');
     }
+
 });
 </script>
