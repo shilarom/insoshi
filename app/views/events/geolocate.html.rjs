@@ -1,6 +1,6 @@
 # TODO Operate on the page object
 if @location.success
-  page << "geolocateAddress(#{@coord[0]},#{@coord[1]},'#{@location.full_address}')"
+  page << "geolocateAddress(#{@coord[0]},#{@coord[1]},'#{@location.full_address}', true);"
 else
   page.alert("Sorry, we were unable to geocode that address")
   page << "map.clearOverlays();"

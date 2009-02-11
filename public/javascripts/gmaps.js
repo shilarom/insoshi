@@ -31,26 +31,26 @@ function createMarker(point,html,options) {
     return marker;
 }
 
-function addAddressToMap(lat,lng,address) {
+function addAddressToMap(lat,lng,address, is_draggable) {
     point = new GLatLng(lat,lng);
     //TODO: must change the icon picture
     var icon = new GIcon(baseIcon,"http://maps.google.com/mapfiles/kml/pal3/icon56.png",null,"http://maps.google.com/mapfiles/kml/pal3/icon56s.png");
-    event = createMarker(point,address,{icon:icon, title:address});
+    event = createMarker(point,address,{icon:icon, draggable:is_draggable, title:address});
     map.addOverlay(event);
     return event;
 }
 
-function geolocateAddress(lat,lng,address) {
-    event = addAddressToMap(lat,lng,address);
-    map.setCenter(event.getLatLng(),13);
+function geolocateAddress(lat,lng,address, is_draggable) {
+    event = addAddressToMap(lat,lng,address,is_draggable);
+    map.setCenter(event.getLatLng(),12);
     GEvent.addListener(event, "dragstart", function() {
         map.closeInfoWindow();
     });
-    //TODO: the next for when de event is draggable
     GEvent.addListener(event, "dragend", function() {
-        event.openInfoWindowHtml(address);
+        event.openInfoWindowHtml("Event location modified");
         document.getElementById("event_lat").value = event.getLatLng().lat();
         document.getElementById("event_lng").value = event.getLatLng().lng();
+        document.getElementById("address").value = '';
     });
     document.getElementById("event_lat").value = lat;
     document.getElementById("event_lng").value = lng;
