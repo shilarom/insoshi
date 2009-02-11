@@ -57,7 +57,8 @@ class EventsController < ApplicationController
     @event.end_time = params[:date][:end].to_time +
         params[:end][:hour].to_i.hours +
         params[:end][:minute].to_i.minutes
-    
+    @event.full_address = (GoogleGeocoder.reverse_geocode "#{@event.lat},#{@event.lng}").full_address
+
     respond_to do |format|
       if @event.save
         flash[:notice] = 'Event was successfully created.'
@@ -79,6 +80,8 @@ class EventsController < ApplicationController
       params[:event][:end_time] = params[:date][:end].to_datetime +
           params[:end][:hour].to_i.hours +
           params[:end][:minute].to_i.minutes
+      params[:event][:full_address] = (GoogleGeocoder.reverse_geocode "#{@event.lat},#{@event.lng}").full_address
+      
       if @event.update_attributes(params[:event])
         flash[:notice] = 'Event was successfully updated.'
         format.html { redirect_to(@event) }
