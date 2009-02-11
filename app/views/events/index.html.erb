@@ -11,6 +11,8 @@
   <%= render :partial => 'calendar',
              :locals => { :events => @month_events, :date => @date } %>
 
+  <%= render :partial => 'event_location', :locals => { :events => @events } %>
+
   <h2>Add new event</h2>
   <%= link_to "Click here", new_event_path %>
 <% end -%>

@@ -31,17 +31,18 @@ function createMarker(point,html,options) {
     return marker;
 }
 
-// addAddressToMap() is called when the geocoder returns an
-// answer.  It adds a marker to the map with an open info window
-// showing the nicely formatted version of the address and the country code.
 function addAddressToMap(lat,lng,address) {
-    map.clearOverlays();
     point = new GLatLng(lat,lng);
     //TODO: must change the icon picture
     var icon = new GIcon(baseIcon,"http://maps.google.com/mapfiles/kml/pal3/icon56.png",null,"http://maps.google.com/mapfiles/kml/pal3/icon56s.png");
-    event = createMarker(point,address,{icon:icon, title:"Su domicilio"});
+    event = createMarker(point,address,{icon:icon, title:address});
     map.addOverlay(event);
-    map.setCenter(point,13);
+    return event;
+}
+
+function geolocateAddress(lat,lng,address) {
+    event = addAddressToMap(lat,lng,address);
+    map.setCenter(event.getLatLng(),13);
     GEvent.addListener(event, "dragstart", function() {
         map.closeInfoWindow();
     });
@@ -55,4 +56,3 @@ function addAddressToMap(lat,lng,address) {
     document.getElementById("event_lng").value = lng;
     event.openInfoWindowHtml(address);
 }
-

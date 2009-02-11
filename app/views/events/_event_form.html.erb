@@ -108,9 +108,10 @@ $(document).ready(function(){
 
     //For Google Maps
     initialize_map();
+    map.clearOverlays();
     
     if (parseFloat($('#event_lat').val()) != 0 && parseFloat($('#event_lng').val()) != 0){
-      addAddressToMap($('#event_lat').val(),$('#event_lng').val(),'Event Location');
+      geolocateAddress($('#event_lat').val(),$('#event_lng').val(),'Event Location');
     }
 
 });
