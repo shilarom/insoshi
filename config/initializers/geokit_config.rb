@@ -2,7 +2,7 @@ if defined? Geokit
 	require 'geokit' #requires the Geokit gem
 
 	# These defaults are used in Geokit::Mappable.distance_to and in acts_as_mappable
-	Geokit::default_units = :miles
+	Geokit::default_units = :kms
 	Geokit::default_formula = :sphere
 
 	# This is the timeout value in seconds to be used for calls to the geocoder web

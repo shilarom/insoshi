@@ -2,8 +2,9 @@ class EventsController < ApplicationController
 
 #  before_filter :in_progress unless test?
   before_filter :login_required
-  before_filter :load_event, :except => [:index, :new, :create, :geolocate, :showlocation]
-  before_filter :load_date, :only => [:index, :show]
+  before_filter :load_event, :except => [:index, :new, :create, :geolocate,
+    :showlocation, :search]
+  before_filter :load_date, :only => [:index, :show, :search]
   before_filter :authorize_show, :only => :show
   before_filter :authorize_change, :only => [:edit, :update]
   before_filter :authorize_destroy, :only => :destroy
@@ -106,6 +107,13 @@ class EventsController < ApplicationController
     @location = MultiGeocoder.geocode(params[:address])
     if @location.success
       @coord = @location.to_a
+    end
+  end
+
+  def search
+    @events = Event.find(:all, :origin => params[:q], :within => params[:within] || 50)
+    respond_to do |format|
+      format.html
     end
   end
 

@@ -18,6 +18,9 @@
 
 class Event < ActiveRecord::Base
   include ActivityLogger
+  require 'geokit'
+  require 'vendor/plugins/geokit-rails/init.rb'
+  acts_as_mappable
 
   attr_accessible :title, :description, :start_time, :end_time, :lat, :lng, :full_address
 

@@ -50,6 +50,7 @@
 <% end -%>
 
 <% column_div :type => :secondary do -%>
+  <%= render :partial => 'search' %>
   <%= render :partial => 'calendar',
              :locals => { :events => @month_events, :date => @date } %>
 
