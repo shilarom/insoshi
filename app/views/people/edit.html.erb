@@ -38,7 +38,8 @@
         <br />
         <%= text_field_tag :address %>
         <%= submit_to_remote 'geolocate_button', 'Geolocate',
-          :url => {:action => 'geolocate', :map => @map, :method => :get},
+          :url => {:controller => 'events', :action => 'geolocate',
+                   :type => 'person', :map => @map, :method => :get},
           :after => '$("#loading").css("visibility","visible")',
           :complete => '$("#loading").css("visibility","hidden")', :html => {:class => "button"} %>
         <%= image_tag "loading.gif", :id => "loading", :class => "hidden" %>

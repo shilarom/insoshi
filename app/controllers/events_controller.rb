@@ -105,13 +105,14 @@ class EventsController < ApplicationController
 
   def geolocate
     @location = MultiGeocoder.geocode(params[:address])
+    @type = params[:type]
     if @location.success
       @coord = @location.to_a
     end
   end
 
   def search
-    @events = Event.find(:all, :origin => params[:q], :within => params[:within] || 50)
+    @events = Event.find(:all, :origin => params[:q], :within => params[:within] || 50, :order => "start_time DESC")
     respond_to do |format|
       format.html
     end
