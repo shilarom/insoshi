@@ -112,7 +112,7 @@ $(document).ready(function(){
     map.clearOverlays();
     
     if (parseFloat($('#event_lat').val()) != 0 && parseFloat($('#event_lng').val()) != 0){
-      geolocateAddress($('#event_lat').val(),$('#event_lng').val(),'Event Location', true);
+      geolocateAddress($('#event_lat').val(),$('#event_lng').val(),'Event Location', true, 'event');
     }
 
 });

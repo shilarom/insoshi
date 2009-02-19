@@ -31,13 +31,17 @@
 class Person < ActiveRecord::Base
   include ActivityLogger
   extend PreferencesHelper
+  require 'geokit'
+  require 'vendor/plugins/geokit-rails/init.rb'
+  acts_as_mappable
 
   attr_accessor :password, :verify_password, :new_password,
                 :sorted_photos
   attr_accessible :email, :password, :password_confirmation, :name,
                   :description, :connection_notifications,
                   :message_notifications, :wall_comment_notifications,
-                  :blog_comment_notifications, :identity_url
+                  :blog_comment_notifications, :identity_url, :lat, :lng,
+                  :address
   # Indexed fields for Sphinx
   is_indexed :fields => [ 'name', 'description', 'deactivated',
                           'email_verified'],
@@ -377,6 +381,11 @@ class Person < ActiveRecord::Base
     # I tried to do this in SQL for efficiency, but failed miserably.
     # Horrifyingly, MySQL lacks support for the INTERSECT keyword.
     (contacts & other_person.contacts).paginate(options)
+  end
+
+  #Return true if it has insert its geolocation
+  def geolocated?
+    self.lat != 0 and self.lng != 0
   end
   
   protected

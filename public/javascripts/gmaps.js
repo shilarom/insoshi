@@ -31,28 +31,35 @@ function createMarker(point,html,options) {
     return marker;
 }
 
-function addAddressToMap(lat,lng,address, is_draggable) {
+function addAddressToMap(lat,lng,address, is_draggable,marker_type) {
     point = new GLatLng(lat,lng);
     //TODO: must change the icon picture
-    var icon = new GIcon(baseIcon,"http://maps.google.com/mapfiles/kml/pal3/icon56.png",null,"http://maps.google.com/mapfiles/kml/pal3/icon56s.png");
+    var image = 'http://maps.google.com/mapfiles/kml/pal5/icon14.png';
+    var shadow = 'http://maps.google.com/mapfiles/kml/pal5/icon14s.png'
+    switch(marker_type){
+        case 'person':
+            image = 'http://maps.google.com/mapfiles/kml/pal3/icon56.png';
+            shadow = 'http://maps.google.com/mapfiles/kml/pal3/icon56s.png/';
+    }
+    var icon = new GIcon(baseIcon,image,null,shadow);
     event = createMarker(point,address,{icon:icon, draggable:is_draggable, title:address});
     map.addOverlay(event);
     return event;
 }
 
-function geolocateAddress(lat,lng,address, is_draggable) {
-    event = addAddressToMap(lat,lng,address,is_draggable);
+function geolocateAddress(lat,lng,address, is_draggable, marker_type) {
+    event = addAddressToMap(lat,lng,address,is_draggable,marker_type);
     map.setCenter(event.getLatLng(),12);
     GEvent.addListener(event, "dragstart", function() {
         map.closeInfoWindow();
     });
     GEvent.addListener(event, "dragend", function() {
-        event.openInfoWindowHtml("Event location modified");
-        document.getElementById("event_lat").value = event.getLatLng().lat();
-        document.getElementById("event_lng").value = event.getLatLng().lng();
+        event.openInfoWindowHtml(marker_type+" location modified");
+        document.getElementById(marker_type+"_lat").value = event.getLatLng().lat();
+        document.getElementById(marker_type+"_lng").value = event.getLatLng().lng();
         document.getElementById("address").value = '';
     });
-    document.getElementById("event_lat").value = lat;
-    document.getElementById("event_lng").value = lng;
+    document.getElementById(marker_type+"_lat").value = lat;
+    document.getElementById(marker_type+"_lng").value = lng;
     event.openInfoWindowHtml(address);
 }

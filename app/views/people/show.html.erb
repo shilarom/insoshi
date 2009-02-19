@@ -1,4 +1,4 @@
-<div id="profile" style="display: none;">
+<div id="profile" style="display: hidden;">
   <% tabs = TabsRenderer.new(self, :id => "tabCol") %>
   <% tabs.create('tProfile', 'Profile', :class => "profile vcard") do %>
     <%= render :partial => 'profile' %>
@@ -28,6 +28,12 @@
   <% tabs.create('tGalleries', 'Galleries') do %>
     <%= render :partial => "shared/galleries",
                :locals => { :galleries => @galleries } %>
+    <div class="clear"></div>
+  <% end %>
+
+  <% tabs.create('tEvents', 'Events') do %>
+    <%= render :partial => "shared/events",
+               :locals => { :events => @events } %>
     <div class="clear"></div>
   <% end %>
 

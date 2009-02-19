@@ -91,6 +91,10 @@ class Event < ActiveRecord::Base
     self.privacy == PRIVACY[:contacts]
   end
 
+  def geolocated?
+    self.lat != 0 and self.lng != 0
+  end
+
   private
 
     def log_activity

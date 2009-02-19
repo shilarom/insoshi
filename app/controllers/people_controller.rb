@@ -32,6 +32,8 @@ class PeopleController < ApplicationController
       @blog = @person.blog
       @posts = @person.blog.posts.paginate(:page => params[:page])
       @galleries = @person.galleries.paginate(:page => params[:page])
+      @events = @person.geolocated? ?
+        Event.find(:all, :origin => [@person.lat,@person.lng], :within => params[:within] || 100) : []
     end
     respond_to do |format|
       format.html

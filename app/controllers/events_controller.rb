@@ -81,7 +81,7 @@ class EventsController < ApplicationController
       params[:event][:end_time] = params[:date][:end].to_datetime +
           params[:end][:hour].to_i.hours +
           params[:end][:minute].to_i.minutes
-      params[:event][:full_address] = (GoogleGeocoder.reverse_geocode "#{@event.lat},#{@event.lng}").full_address
+      params[:event][:full_address] = (GoogleGeocoder.reverse_geocode "#{params[:event][:lat]},#{params[:event][:lng]}").full_address
       
       if @event.update_attributes(params[:event])
         flash[:notice] = 'Event was successfully updated.'

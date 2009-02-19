@@ -9,9 +9,9 @@
     initialize_map();
     bounds = new GLatLngBounds();
     <%- events.each do |event| -%>
-        <%- if event.lat != 0 and event.lng != 0 -%>
+        <%- if event.geolocated? -%>
           bounds.extend(new GLatLng(<%= event.lat.to_s + ','+ event.lng.to_s %>));
-          addAddressToMap(<%= event.lat.to_s + ',' + event.lng.to_s + ',' + "'#{event.title}'"%>, false);
+          addAddressToMap(<%= event.lat.to_s + ',' + event.lng.to_s + ',' + "'#{event.title}'"%>, false, 'event');
         <%- end -%>
     <%- end -%>
     map.setCenter(bounds.getCenter());
